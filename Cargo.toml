@@ -1,0 +1,16 @@
+[package]
+
+name = "roots"
+version = "0.0.1"
+authors = ["Mikhail Vorotilov <mikhail.vorotilov@gmail.com>"]
+license = "BSD-2-Clause"
+repository = "https://github.com/vorot/roots"
+description = """
+Library of well known algorithms for numerical root finding.
+"""
+readme = "README.md"
+keywords = [ "math", "numerical", "root", "newton", "raphson", "regula falsi", "secant", "brent", "cubic equation", "quartic equation" ]
+
+[lib]
+name = "roots"
+path = "src/lib.rs"
