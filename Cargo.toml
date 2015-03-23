@@ -9,7 +9,7 @@ description = """
 Library of well known algorithms for numerical root finding.
 """
 readme = "README.md"
-keywords = [ "math", "numerical", "root", "newton", "raphson", "regula falsi", "secant", "brent", "cubic equation", "quartic equation" ]
+keywords = [ "math", "numerical", "root", "cubic", "quartic" ]
 
 [lib]
 name = "roots"
