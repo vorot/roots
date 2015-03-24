@@ -1,4 +1,4 @@
-#roots [![Crates.io](https://img.shields.io/crates/v/roots.svg)](https://crates.io/crates/roots) #
+#roots [![Build Status](https://travis-ci.org/vorot/roots.svg)](https://travis-ci.org/vorot/roots)[![Crates.io](https://img.shields.io/crates/v/roots.svg)](https://crates.io/crates/roots) #
 
 Library of well known algorithms for numerical root finding.
 
