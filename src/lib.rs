@@ -25,8 +25,9 @@
 //#![crate_id = "roots"]
 #![crate_type = "lib"]
 #![feature(std_misc)]
-#![feature(core)]
-#![feature(collections)]
+#![feature(slice_patterns)]
+#![feature(convert)]
+#![feature(test)]
 
 //! A set of functions for finding roots of numerical equations.
 //!
@@ -40,24 +41,30 @@
 //! by implementing the Convergency trait.
 //! Functions find_roots_* return all roots of several simple equations at once.
 
+use std::num::Float;
+
 macro_rules! assert_float_eq(
     ($precision:expr, $given:expr , $expected:expr) => ({
-        match (&($precision), &($given), &($expected)) {
-            (precision_val, given_val, expected_val) => {
-              if !((given_val-expected_val).abs() < precision_val.abs()) {
-                panic!("floats are not the same: (given: `{:.15e}`, expected: `{:.15e}`, precision: `{:.15e}`, delta: `{:.15e}`)", *given_val, *expected_val, *precision_val, *given_val-*expected_val )
-              }
+      use std::num::Float;
+      match (&($precision), &($given), &($expected)) {
+          (precision_val, given_val, expected_val) => {
+            let diff = given_val-expected_val;
+            if diff.abs() > precision_val.abs() {
+              panic!("floats are not the same: (`{}`: `{:.15e}`, expected: `{:.15e}`, precision: `{:.15e}`, delta: `{:.15e}`)", stringify!($given), *given_val, *expected_val, *precision_val, diff )
             }
-        }
+          }
+      }
     })
 );
 
 mod analytical;
 mod numerical;
 
+pub use self::analytical::roots::Roots;
 pub use self::analytical::linear::find_roots_linear;
 pub use self::analytical::quadratic::find_roots_quadratic;
 pub use self::analytical::cubic::find_roots_cubic;
+pub use self::analytical::cubic_depressed::find_roots_cubic_depressed;
 pub use self::analytical::cubic_normalized::find_roots_cubic_normalized;
 pub use self::analytical::biquadratic::find_roots_biquadratic;
 pub use self::analytical::quartic_depressed::find_roots_quartic_depressed;
@@ -71,3 +78,46 @@ pub use self::numerical::newton_raphson::find_root_newton_raphson;
 pub use self::numerical::brent::find_root_brent;
 pub use self::numerical::secant::find_root_secant;
 pub use self::numerical::regula_falsi::find_root_regula_falsi;
+
+/// Adds constants to the std::num::Float type
+pub trait FloatWithConstants:Float {
+  #[inline]
+  fn two() -> Self;
+  #[inline]
+  fn three() -> Self;
+  #[inline]
+  fn pi() -> Self;
+  #[inline]
+  fn one_third() -> Self { Self::one() / Self::three() }
+  #[inline]
+  fn four() -> Self { Self::two() + Self::two() }
+  #[inline]
+  fn five() -> Self { Self::two() + Self::three() }
+  #[inline]
+  fn nine() -> Self { Self::three() * Self::three() }
+  #[inline]
+  fn twenty_seven() -> Self { Self::nine() * Self::three() }
+  #[inline]
+  fn two_third_pi() -> Self { Self::pi() * Self::two() / Self::three() }
+}
+
+impl FloatWithConstants for f32 {
+  #[inline]
+  fn two() -> Self { 2f32 }
+  #[inline]
+  fn three() -> Self { 3f32 }
+  #[inline]
+  fn pi() -> Self { 3.1415926535897932384626433832795028841971693993751058209749445923078164062_f32 }
+}
+
+impl FloatWithConstants for f64 {
+  #[inline]
+  fn two() -> Self { 2f64 }
+  #[inline]
+  fn three() -> Self { 3f64 }
+  #[inline]
+  fn pi() -> Self { 3.1415926535897932384626433832795028841971693993751058209749445923078164062_f64 }
+}
+
+#[cfg(test)]
+mod bench;

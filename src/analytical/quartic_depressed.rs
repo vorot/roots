@@ -22,8 +22,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::num::Float;
-use std::cmp::Ordering;
+use super::super::FloatWithConstants;
+use super::super::Roots;
 
 /// Solves a depressed quartic equation x^4 + a2*x^2 + a1*x + a0 = 0.
 ///
@@ -35,69 +35,66 @@ use std::cmp::Ordering;
 /// use roots::find_roots_quartic_depressed;
 ///
 /// let one_root = find_roots_quartic_depressed(1f64, 0f64, 0f64);
-/// // Returns (Some(0f64), None, None, None) as 'x^4 = 0' has one root 0
+/// // Returns Roots::One([Some(0f64)]) as 'x^4 = 0' has one root 0
 ///
 /// let two_roots = find_roots_quartic_depressed(1f32, 0f32, -1f32);
-/// // Returns (Some(-1f32), Some(1f32), None, None) as 'x^4 - 1 = 0' has roots -1 and 1
+/// // Returns Roots::Two([Some(-1f32), Some(1f32)]) as 'x^4 - 1 = 0' has roots -1 and 1
 /// ```
-pub fn find_roots_quartic_depressed<F:Float>(a2:F, a1:F, a0:F) -> Vec<F> {
+pub fn find_roots_quartic_depressed<F:FloatWithConstants>(a2:F, a1:F, a0:F) -> Roots<F> {
   // Handle non-standard cases
-  let mut roots = if a1 == F::zero() {
+  if a1 == F::zero() {
     // a1 = 0; x^4 + a2*x^2 + a0 = 0; solve biquadratic equation
     super::biquadratic::find_roots_biquadratic(F::one(), a2, a0)
   } else if a0 == F::zero() {
-    // a0 = 0; x^4 + a2*x^2 + a1*x = 0; reduce to normalized cubic and arrange results
-    let mut tmp = vec![F::zero()];
-    tmp.push_all(super::cubic_normalized::find_roots_cubic_normalized(F::zero(), a2, a1).as_slice());
-    tmp
+    // a0 = 0; x^4 + a2*x^2 + a1*x = 0; reduce to normalized cubic and add zero root
+    super::cubic_normalized::find_roots_cubic_normalized(F::zero(), a2, a1).add_sorted(F::zero())
   } else {
     // Solve the auxiliary equation y^3 + (5/2)*a2*y^2 + (2*a2^2-a0)*y + (a2^3/2 - a2*a0/2 - a1^2/8) = 0
-    let _2 = F::one() + F::one();
-    let _3 = _2 + F::one();
-    let _4 = _2 + _2;
-    let _5 = _2 + _3;
-    let _a2_2 = a2*a2;
-    let _a2_div_2 = a2 / _2;
+    let a2_pow_2 = a2*a2;
+    let a1_div_2 = a1 / F::two();
+    let (b2,b1,b0) = (a2*F::five()/F::two(), F::two()*a2_pow_2-a0, (a2_pow_2*a2 - a2*a0 - a1_div_2*a1_div_2)/F::two());
 
-    // last root is the maximal one
-    let y = super::cubic_normalized::find_roots_cubic_normalized(a2*_5/_2, _2*_a2_2-a0, (_a2_2*a2 - a2*a0 - a1*a1/_4)/_2).pop().unwrap();
+    // At least one root always exists. The last root is the maximal one.
+    let y = *super::cubic_normalized::find_roots_cubic_normalized(b2,b1,b0)
+      .as_ref()
+      .iter()
+      .last()
+      .unwrap();
 
-    let _a2_plus_2y = a2 + _2*y;
+    let _a2_plus_2y = a2 + F::two()*y;
     if _a2_plus_2y > F::zero() {
       let sqrt_a2_plus_2y = _a2_plus_2y.sqrt();
-      let q1 = sqrt_a2_plus_2y;
-      let q0a = a2 + y - a1/(_2*sqrt_a2_plus_2y);
-      let q0b = a2 + y + a1/(_2*sqrt_a2_plus_2y);
+      let q0a = a2 + y - a1_div_2/sqrt_a2_plus_2y;
+      let q0b = a2 + y + a1_div_2/sqrt_a2_plus_2y;
 
-      let mut tmp = super::quadratic::find_roots_quadratic(F::one(), q1, q0a);
-      tmp.push_all(super::quadratic::find_roots_quadratic(F::one(), -q1, q0b).as_slice());
-      tmp
+      let mut roots = super::quadratic::find_roots_quadratic(F::one(), sqrt_a2_plus_2y, q0a);
+      let roots2 = super::quadratic::find_roots_quadratic(F::one(), -sqrt_a2_plus_2y, q0b);
+      for x in roots2.as_ref().iter() {
+        roots = roots.add_sorted(*x);
+      }
+      roots
     } else {
-      vec![]
+      Roots::No([])
     }
-  };
-
-  roots.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-  roots.dedup();
-  roots
+  }
 }
 
 #[test]
-fn test_find_roots_biquadratic() {
-  assert_eq!(find_roots_quartic_depressed(0f32, 0f32, 0f32), [0f32]);
-  assert_eq!(find_roots_quartic_depressed(1f32, 1f32, 1f32), []);
+fn test_find_roots_quartic_depressed() {
+  assert_eq!(find_roots_quartic_depressed(0f32, 0f32, 0f32), Roots::One([0f32]));
+  assert_eq!(find_roots_quartic_depressed(1f32, 1f32, 1f32), Roots::No([]));
 
   // Thanks WolframAlpha for the test data
-  match find_roots_quartic_depressed(1f64, 1f64, -1f64).as_slice() {
-    [x1, x2] => {
+  match find_roots_quartic_depressed(1f64, 1f64, -1f64) {
+    Roots::Two([x1, x2]) => {
       assert_float_eq!(1e-15, x1, -1f64 );
       assert_float_eq!(1e-15, x2, 0.5698402909980532659114f64 );
     },
     _ => { assert!(false); }
   }
 
-  match find_roots_quartic_depressed(-10f64, 5f64, 1f64).as_slice() {
-    [x1, x2, x3, x4] => {
+  match find_roots_quartic_depressed(-10f64, 5f64, 1f64) {
+    Roots::Four([x1, x2, x3, x4]) => {
       assert_float_eq!(1e-15, x1, -3.3754294311910698f64 );
       assert_float_eq!(1e-15, x2, -0.1531811728532153f64 );
       assert_float_eq!(1e-15, x3, 0.67861075799846644f64 );

@@ -22,14 +22,21 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-pub mod linear;
-pub mod quadratic;
-pub mod cubic;
-pub mod cubic_depressed;
-pub mod cubic_normalized;
-pub mod biquadratic;
-pub mod quartic_depressed;
-pub mod quartic;
-pub mod roots;
+use std::num::Float;
 
-mod cbrt;
+/// The cubic root function is pow(x, 1/3) accepting negative arguments
+pub fn cbrt<F:Float>(x:F) -> F {
+  // Rust lacks a simple way to convert an integer constant to generic type F
+  let _1_3 = F::one() / (F::one() + F::one() + F::one());
+
+  if x < F::zero() {
+    -(-x).powf(_1_3)
+  } else {
+    x.powf(_1_3)
+  }
+}
+
+#[test]
+fn test_cbrt() {
+  assert_eq!(cbrt(-8f64), -2f64);
+}

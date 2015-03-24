@@ -22,8 +22,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::num::Float;
-use std::cmp::Ordering;
+use super::super::FloatWithConstants;
+use super::super::Roots;
 
 /// Solves a bi-quadratic equation a4*x^4 + a2*x^2 + a0 = 0.
 ///
@@ -43,32 +43,34 @@ use std::cmp::Ordering;
 /// let two_roots = find_roots_biquadratic(1f32, 0f32, -1f32);
 /// // Returns [-1f32, 1f32] as 'x^4 - 1 = 0' has roots -1 and 1
 /// ```
-pub fn find_roots_biquadratic<F:Float>(a4:F, a2:F, a0:F) -> Vec<F> {
+pub fn find_roots_biquadratic<F:FloatWithConstants>(a4:F, a2:F, a0:F) -> Roots<F> {
   // Handle non-standard cases
   if a4 == F::zero() {
     // a4 = 0; a2*x^2 + a0 = 0; solve quadratic equation
     super::quadratic::find_roots_quadratic(a2, F::zero(), a0)
+  } else if a0 == F::zero() {
+    // a0 = 0; a4*x^4 + a2*x^2 = 0; solve quadratic equation and add zero root
+    super::quadratic::find_roots_quadratic(a4, F::zero(), a2).add_sorted(F::zero())
   } else {
     // solve the corresponding quadratic equation and order roots
     // The function find_roots_quadratic returns an increasing tuple
     // Match evaluates branches consequently
-    let mut roots = match super::quadratic::find_roots_quadratic(a4, a2, a0).as_slice() {
-      [x1] if x1 >= F::zero() => vec![-x1.sqrt(), x1.sqrt()],
-      [x1,x2] if x1 >= F::zero() => vec![-x2.sqrt(), -x1.sqrt(), x1.sqrt(), x2.sqrt()],
-      [_,x2] if x2 >= F::zero() => vec![-x2.sqrt(), x2.sqrt()],
-      _ => vec![],
-    };
-
-    roots.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-    roots.dedup();
-    roots
+    match super::quadratic::find_roots_quadratic(a4, a2, a0) {
+      Roots::One([x1]) if x1 == F::zero() => Roots::One([F::zero()]),
+      Roots::One([x1]) if x1 > F::zero() => Roots::Two([-x1.sqrt(), x1.sqrt()]),
+      Roots::Two([x1,x2]) if x1 == F::zero() => Roots::Three([-x2.sqrt(), F::zero(), x2.sqrt()]),
+      Roots::Two([x1,x2]) if x1 >= F::zero() => Roots::Four([-x2.sqrt(), -x1.sqrt(), x1.sqrt(), x2.sqrt()]),
+      Roots::Two([_,x2]) if x2 == F::zero() => Roots::One([F::zero()]),
+      Roots::Two([_,x2]) if x2 >= F::zero() => Roots::Two([-x2.sqrt(), x2.sqrt()]),
+      _ => Roots::No([]),
+    }
   }
 }
 
 #[test]
 fn test_find_roots_biquadratic() {
-  assert_eq!(find_roots_biquadratic(0f32, 0f32, 0f32), [0f32]);
-  assert_eq!(find_roots_biquadratic(1f32, 0f32, 1f32), []);
-  assert_eq!(find_roots_biquadratic(1f64, 0f64, -1f64), [-1f64, 1f64]);
-  assert_eq!(find_roots_biquadratic(1f64, -5f64, 4f64), [-2f64, -1f64, 1f64, 2f64]);
+  assert_eq!(find_roots_biquadratic(0f32, 0f32, 0f32), Roots::One([0f32]));
+  assert_eq!(find_roots_biquadratic(1f32, 0f32, 1f32), Roots::No([]));
+  assert_eq!(find_roots_biquadratic(1f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
+  assert_eq!(find_roots_biquadratic(1f64, -5f64, 4f64), Roots::Four([-2f64, -1f64, 1f64, 2f64]));
 }

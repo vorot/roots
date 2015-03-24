@@ -22,7 +22,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::num::Float;
+use super::super::FloatWithConstants;
+use super::super::Roots;
 
 /// Solves a quadratic equation a2*x^2 + a1*x + a0 = 0.
 ///
@@ -31,6 +32,7 @@ use std::num::Float;
 /// # Examples
 ///
 /// ```
+/// use roots::Roots;
 /// use roots::find_roots_quadratic;
 ///
 /// let no_roots = find_roots_quadratic(1f32, 0f32, 1f32);
@@ -42,23 +44,23 @@ use std::num::Float;
 /// let two_roots = find_roots_quadratic(1f32, 0f32, -1f32);
 /// // Returns [-1f32,1f32] as 'x^2 - 1 = 0' has roots -1 and 1
 /// ```
-pub fn find_roots_quadratic<F:Float>(a2:F, a1:F, a0:F) -> Vec<F> {
+pub fn find_roots_quadratic<F:FloatWithConstants>(a2:F, a1:F, a0:F) -> Roots<F> {
   // Handle non-standard cases
   if a2 == F::zero() {
     // a2 = 0; a1*x+a0=0; solve linear equation
     super::linear::find_roots_linear(a1, a0)
   } else {
     // Rust lacks a simple way to convert an integer constant to generic type F
-    let a2x2 = a2+a2;
-    let discriminant = a1*a1 - (a2x2)*(a0+a0);
+    let a2x2 = F::two()*a2;
+    let discriminant = a1*a1 - F::four()*a2*a0;
     if discriminant < F::zero() {
-      vec![]
+      Roots::No([])
     } else {
       if discriminant == F::zero() {
-        vec![-a1/a2x2]
+        Roots::One([-a1/a2x2])
       } else {
         let sq = discriminant.sqrt();
-        vec![(-a1-sq)/a2x2, (-a1+sq)/a2x2]
+        Roots::Two([(-a1-sq)/a2x2, (-a1+sq)/a2x2])
       }
     }
   }
@@ -66,7 +68,7 @@ pub fn find_roots_quadratic<F:Float>(a2:F, a1:F, a0:F) -> Vec<F> {
 
 #[test]
 fn test_find_roots_quadratic() {
-  assert_eq!(find_roots_quadratic(0f32, 0f32, 0f32), [0f32]);
-  assert_eq!(find_roots_quadratic(1f32, 0f32, 1f32), []);
-  assert_eq!(find_roots_quadratic(1f64, 0f64, -1f64), [-1f64, 1f64]);
+  assert_eq!(find_roots_quadratic(0f32, 0f32, 0f32), Roots::One([0f32]));
+  assert_eq!(find_roots_quadratic(1f32, 0f32, 1f32), Roots::No([]));
+  assert_eq!(find_roots_quadratic(1f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
 }

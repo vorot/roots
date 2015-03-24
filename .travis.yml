@@ -3,6 +3,7 @@ sudo: false
 script:
   - rustc --version
   - cargo test --verbose
+  - cargo bench --verbose
   - cargo doc
 notifications:
   email:

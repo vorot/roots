@@ -22,8 +22,9 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::num::Float;
-use std::cmp::Ordering;
+use super::cbrt::cbrt;
+use super::super::FloatWithConstants;
+use super::super::Roots;
 
 /// Solves a normalized cubic equation x^3 + a2*x^2 + a1*x + a0 = 0.
 ///
@@ -40,27 +41,20 @@ use std::cmp::Ordering;
 /// let three_roots = find_roots_cubic_normalized(0f32, -1f32, 0f32);
 /// // Returns [-1f32, -0f32, 1f32] as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
-pub fn find_roots_cubic_normalized<F:Float>(a2:F, a1:F, a0:F) -> Vec<F> {
-  let _2 = F::one() + F::one();
-  let _3 = _2 + F::one();
-  let _9 = _3 * _3;
-  let _27 = _9 * _3;
-  let _54 = _27 * _2;
-
-  let q = (_3*a1 - a2*a2) / _9;
-  let r = (_9*a2*a1 - _27*a0 - _2*a2*a2*a2) / _54;
+pub fn find_roots_cubic_normalized<F:FloatWithConstants>(a2:F, a1:F, a0:F) -> Roots<F> {
+  let q = (F::three()*a1 - a2*a2) / F::nine();
+  let r = (F::nine()*a2*a1 - F::twenty_seven()*a0 - F::two()*a2*a2*a2) / (F::two()*F::twenty_seven());
   let q3 = q*q*q;
   let d = q3 + r*r;
-  let a2_3 = a2 / _3;
+  let a2_div_3 = a2 / F::three();
 
-  let mut roots = if d < F::zero() {
-    let phi_3 = (r/(-q3).sqrt()).acos() / _3;
-    let sqrt_q_2 = _2*(-q).sqrt();
-    let pi = F::acos(-F::one());
-    let pi2_3 = pi*_2 / _3;
-    let pi4_3 = pi2_3 *_2;
+  if d < F::zero() {
+    let phi_3 = (r/(-q3).sqrt()).acos() / F::three();
+    let sqrt_q_2 = F::two()*(-q).sqrt();
 
-    vec![sqrt_q_2*phi_3.cos() - a2_3, sqrt_q_2*(phi_3 + pi2_3).cos() - a2_3, sqrt_q_2*(phi_3 + pi4_3).cos() - a2_3]
+    Roots::One([sqrt_q_2*phi_3.cos() - a2_div_3])
+      .add_sorted(sqrt_q_2*(phi_3 - F::two_third_pi()).cos() - a2_div_3)
+      .add_sorted(sqrt_q_2*(phi_3 + F::two_third_pi()).cos() - a2_div_3)
   } else {
     let sqrt_d = d.sqrt();
     let s = cbrt(r + sqrt_d);
@@ -68,45 +62,50 @@ pub fn find_roots_cubic_normalized<F:Float>(a2:F, a1:F, a0:F) -> Vec<F> {
 
     if s == t {
       if s + t == F::zero() {
-        vec![s + t - a2_3]
+        Roots::One([s + t - a2_div_3])
       } else {
-        vec![s + t - a2_3, -(s + t) / _2 - a2_3]
+        Roots::One([s + t - a2_div_3])
+          .add_sorted(-(s + t) / F::two() - a2_div_3)
       }
     } else {
-      vec![s + t - a2_3]
+      Roots::One([s + t - a2_div_3])
     }
-  };
-
-  roots.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-  roots.dedup();
-  roots
-}
-
-fn cbrt<F:Float>(x:F) -> F {
-  // Rust lacks a simple way to convert an integer constant to generic type F
-  let _1_3 = F::one() / (F::one() + F::one() + F::one());
-
-  if x < F::zero() {
-    -(-x).powf(_1_3)
-  } else {
-    x.powf(_1_3)
   }
 }
 
 #[test]
-fn test_cbrt() {
-  assert_eq!(cbrt(-8f64), -2f64);
-}
-
-#[test]
 fn test_find_roots_cubic_normalized() {
-  assert_eq!(find_roots_cubic_normalized(0f32, 0f32, 0f32), [0f32]);
+  assert_eq!(find_roots_cubic_normalized(0f32, 0f32, 0f32), Roots::One([0f32]));
 
-  match find_roots_cubic_normalized(0f64, -1f64, 0f64).as_slice() {
-    [x1, x2, x3] => {
+  match find_roots_cubic_normalized(0f64, -1f64, 0f64) {
+    Roots::Three([x1, x2, x3]) => {
       assert_float_eq!(1e-15, x1, -1f64 );
       assert_float_eq!(1e-15, x2, 0f64 );
       assert_float_eq!(1e-15, x3, 1f64 );
+    },
+    _ => { assert!(false); }
+  }
+
+  match find_roots_cubic_normalized(1f64, -2f64, 2f64) {
+    Roots::One([x1]) => {
+      assert_float_eq!(1e-15, x1, -2.269530842081142770853135f64 );
+    },
+    _ => { assert!(false); }
+  }
+
+  match find_roots_cubic_normalized(0f64, -3f64, 2f64) {
+    Roots::Two([x1, x2]) => {
+      assert_float_eq!(1e-15, x1, -2f64 );
+      assert_float_eq!(1e-15, x2, 1f64 );
+    },
+    _ => { assert!(false); }
+  }
+
+  match find_roots_cubic_normalized(-2f64, -3f64, 2f64) {
+    Roots::Three([x1, x2, x3]) => {
+      assert_float_eq!(1e-15, x1, -1.342923082777170208054859f64 );
+      assert_float_eq!(1e-15, x2, 0.5293165801288393926136314f64 );
+      assert_float_eq!(1e-15, x3, 2.813606502648330815441228f64 );
     },
     _ => { assert!(false); }
   }

@@ -23,43 +23,46 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use super::super::FloatWithConstants;
-use super::super::Roots;
 
-/// Solves a linear equation a1*x + a0 = 0.
-///
-/// # Examples
-///
-/// ```
-/// use roots::Roots;
-/// use roots::find_roots_linear;
-///
-/// // Returns Roots::No([]) as '0*x + 1 = 0' has no roots;
-/// let no_root = find_roots_linear(0f32, 1f32);
-/// assert_eq!(no_root, Roots::No([]));
-///
-/// // Returns [0f64] as '1*x + 0 = 0' has the root 0
-/// let root = find_roots_linear(1f64, 0f64);
-/// assert_eq!(root, Roots::One([0f64]));
-///
-/// // Returns [0f32] as 0 is one of roots of '0*x + 0 = 0'
-/// let zero_root = find_roots_linear(0f32, 0f32);
-/// assert_eq!(zero_root, Roots::One([0f32]));
-/// ```
-pub fn find_roots_linear<F:FloatWithConstants>(a1:F, a0:F) -> Roots<F> {
-  if a1 == F::zero() {
-    if a0 == F::zero() {
-      Roots::One([F::zero()])
-    } else {
-      Roots::No([])
+#[derive(Debug,PartialEq)]
+pub enum Roots<F:FloatWithConstants> {
+  No([F;0]),
+  One([F;1]),
+  Two([F;2]),
+  Three([F;3]),
+  Four([F;4]),
+}
+
+impl<F:FloatWithConstants> AsRef<[F]> for Roots<F> {
+  fn as_ref(&self) -> &[F] {
+    match self {
+      &Roots::No(ref x) => x,
+      &Roots::One(ref x) => x,
+      &Roots::Two(ref x) => x,
+      &Roots::Three(ref x) => x,
+      &Roots::Four(ref x) => x,
     }
-  } else {
-    Roots::One([-a0/a1])
   }
 }
 
-#[test]
-fn test_find_roots_linear() {
-  assert_eq!(find_roots_linear(0f32, 0f32), Roots::One([0f32]));
-  assert_eq!(find_roots_linear(2f64, 1f64), Roots::One([-0.5f64]));
-  assert_eq!(find_roots_linear(0f32, 1f32), Roots::No([]));
+impl<F:FloatWithConstants> Roots<F> {
+  pub fn add_sorted(self, x:F) -> Self {
+    match self {
+      Roots::No([]) => Roots::One([x]),
+      Roots::One([x1]) if x==x1 => self,
+      Roots::One([x1]) if x<x1 => Roots::Two([x,x1]),
+      Roots::One([x1]) => Roots::Two([x1,x]),
+      Roots::Two([x1,x2]) if (x==x1) || (x==x2) => self,
+      Roots::Two([x1,x2]) if x<x1 => Roots::Three([x,x1,x2]),
+      Roots::Two([x1,x2]) if x<x2 => Roots::Three([x1,x,x2]),
+      Roots::Two([x1,x2]) => Roots::Three([x1,x2,x]),
+      Roots::Three([x1,x2,x3]) if (x==x1) || (x==x2) || (x==x3) => self,
+      Roots::Three([x1,x2,x3]) if x<x1 => Roots::Four([x,x1,x2,x3]),
+      Roots::Three([x1,x2,x3]) if x<x2 => Roots::Four([x1,x,x2,x3]),
+      Roots::Three([x1,x2,x3]) if x<x3 => Roots::Four([x1,x2,x,x3]),
+      Roots::Three([x1,x2,x3]) => Roots::Four([x1,x2,x3,x]),
+      Roots::Four([x1,x2,x3,x4]) if (x==x1) || (x==x2) || (x==x3) || (x==x4) => self,
+      Roots::Four(_) => panic!("Full"),
+    }
+  }
 }

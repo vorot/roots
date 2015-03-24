@@ -25,6 +25,7 @@
 use std::cell::Cell;
 use std::num::Float;
 use std::fmt::Display;
+use std::fmt::LowerExp;
 use super::Convergency;
 
 /// Convergency provider for debugging.
@@ -51,11 +52,11 @@ impl<F:Float> DebugConvergency<F> {
   }
 }
 
-impl<F:Float+Display> Convergency<F> for DebugConvergency<F> {
+impl<F:Float+Display+LowerExp> Convergency<F> for DebugConvergency<F> {
   /// Prints the value being checked
-  fn is_root_found(&self, y:F) -> bool { println!("#{} check root {}", self.iter.get(), y); y.abs() < self.eps.abs() }
+  fn is_root_found(&self, y:F) -> bool { println!("#{} check root {:.15e}", self.iter.get(), y); y.abs() < self.eps.abs() }
   /// Prints values being checked
-  fn is_converged(&self, x1:F, x2:F) -> bool { println!("#{} check convergency {}-{}", self.iter.get(), x1, x2); (x1-x2).abs() < self.eps.abs() }
+  fn is_converged(&self, x1:F, x2:F) -> bool { println!("#{} check convergency {:.15e}-{:.15e}", self.iter.get(), x1, x2); (x1-x2).abs() < self.eps.abs() }
   /// Updates internal iteration counter
   fn is_iteration_limit_reached(&self, iter:usize) -> bool { println!("#{} check iteration limit {}", self.iter.get(), iter); self.iter.set(iter); iter >= self.max_iter }
 }
