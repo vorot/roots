@@ -18,6 +18,7 @@ Library of well known algorithms for numerical root finding.
 
 ```rust
 extern crate roots;
+use roots::Roots;
 use roots::find_roots_cubic;
 use roots::find_root_brent;
 use roots::find_root_secant;
@@ -25,17 +26,17 @@ use roots::SimpleConvergency;
 
 // Find the root of a complex function in the area determined by a simpler polynom
 fn find_solution(enormous_function: &Fn(f64)->f64, root_area_polynom:(f64,f64,f64,f64)) -> Option<f64> {
-  // destructure polynom coefficients
+  // de-structure polynom coefficients
   match root_area_polynom {
     (a3,a2,a1,a0) => {
       // Set convergency conditions: required precision - 1e-8, max 30 iterations
       let conv = SimpleConvergency{eps:1e-8f64; max_iter:30};
       // Find root area by solving the polynom
-      match find_roots_cubic(a3,a2,a1,a0).as_slice() {
+      match find_roots_cubic(a3,a2,a1,a0) {
         // Try to find the root by one of iterative methods
-        [x1,x2,x3] => { find_root_brent(x1,x3,enormous_function,conv).ok() },
-        [x1,x2] => { find_root_brent(x1,x2,enormous_function,conv).ok() },
-        [x1] => { find_root_secant(x1-1f64,x1+1f64,enormous_function,conv).ok() },
+        Roots::Three(roots) => { find_root_brent(roots[0],roots[2],enormous_function,conv).ok() },
+        Roots::Two(roots) => { find_root_brent(roots[0],roots[1],enormous_function,conv).ok() },
+        Roots::One(roots) => { find_root_secant(roots[0]-1f64,roots[0]+1f64,enormous_function,conv).ok() },
         _ => None,
       }
     },

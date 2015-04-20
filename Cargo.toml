@@ -1,7 +1,7 @@
 [package]
 
 name = "roots"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Mikhail Vorotilov <mikhail.vorotilov@gmail.com>"]
 license = "BSD-2-Clause"
 repository = "https://github.com/vorot/roots"
@@ -9,7 +9,7 @@ description = """
 Library of well known algorithms for numerical root finding.
 """
 readme = "README.md"
-keywords = [ "math", "numerical", "root", "cubic", "quartic" ]
+keywords = [ "math", "root", "numerical", "cubic", "quartic" ]
 
 [lib]
 name = "roots"
