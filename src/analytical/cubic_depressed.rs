@@ -22,8 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use super::cbrt::cbrt;
-use super::super::FloatWithConstants;
+use super::super::FloatType;
 use super::super::Roots;
 
 /// Solves a depressed cubic equation x^3 + a1*x + a0 = 0.
@@ -36,17 +35,17 @@ use super::super::Roots;
 /// use roots::find_roots_cubic_depressed;
 ///
 /// let one_root = find_roots_cubic_depressed(0f64, 0f64);
-/// // Returns [0f64] as 'x^3 = 0' has one root 0
+/// // Returns Roots::One([0f64]) as 'x^3 = 0' has one root 0
 ///
 /// let three_roots = find_roots_cubic_depressed(-1f32, 0f32);
-/// // Returns [-1f32, -0f32, 1f32] as 'x^3 - x = 0' has roots -1, 0, and 1
+/// // Returns Roots::Three([-1f32, -0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
-pub fn find_roots_cubic_depressed<F:FloatWithConstants>(a1:F, a0:F) -> Roots<F> {
+pub fn find_roots_cubic_depressed<F:FloatType>(a1:F, a0:F) -> Roots<F> {
   if a1 == F::zero() {
-    Roots::One([cbrt(-a0)])
+    Roots::One([-a0.cbrt()])
   }
   else if a0 == F::zero() {
-    super::quadratic::find_roots_quadratic(F::one(), F::zero(), a1).add_sorted(F::zero())
+    super::quadratic::find_roots_quadratic(F::one(), F::zero(), a1).add_new_root(F::zero())
   }
   else {
     let d = a0 * a0 / F::four() + a1 * a1 * a1 / F::twenty_seven();
@@ -56,17 +55,17 @@ pub fn find_roots_cubic_depressed<F:FloatWithConstants>(a1:F, a0:F) -> Roots<F> 
       
       let phi = (-F::four()*a0/(a * a * a) ).acos() / F::three();
       Roots::One([a*phi.cos()])
-        .add_sorted(a*(phi + F::two_third_pi()).cos())
-        .add_sorted(a*(phi - F::two_third_pi()).cos())
+        .add_new_root(a*(phi + F::two_third_pi()).cos())
+        .add_new_root(a*(phi - F::two_third_pi()).cos())
     }
     else {
       let sqrt_d = d.sqrt();
       let a0_div_2 = a0/F::two();
-      let x1 = cbrt(sqrt_d - a0_div_2) - cbrt(sqrt_d + a0_div_2);
+      let x1 = (sqrt_d - a0_div_2).cbrt() - (sqrt_d + a0_div_2).cbrt();
       if d == F::zero() {
         // one real root and one double root
         Roots::One([x1])
-          .add_sorted(a0_div_2)
+          .add_new_root(a0_div_2)
       } 
       else {
         // one real root
@@ -82,25 +81,22 @@ fn test_find_roots_cubic_depressed() {
   assert_eq!(find_roots_cubic_depressed(-1f64, 0f64), Roots::Three([-1f64, 0f64, 1f64]));
 
   match find_roots_cubic_depressed(-2f64, 2f64) {
-    Roots::One([x1]) => {
-      assert_float_eq!(1e-15, x1, -1.769292354238631415240409f64 );
+    Roots::One(x) => {
+      assert_float_array_eq!(1e-15, x, [-1.769292354238631415240409f64] );
     },
     _ => { assert!(false); }
   }
 
   match find_roots_cubic_depressed(-3f64, 2f64) {
-    Roots::Two([x1,x2]) => {
-      assert_float_eq!(1e-15, x1, -2f64 );
-      assert_float_eq!(1e-15, x2, 1f64 );
+    Roots::Two(x) => {
+      assert_float_array_eq!(1e-15, x, [-2f64,1f64] );
     },
     _ => { assert!(false); }
   }
   
   match find_roots_cubic_depressed(-2f64, 1f64) {
-    Roots::Three([x1,x2,x3]) => {
-      assert_float_eq!(1e-15, x1, (-1f64 - 5f64.sqrt()) / 2f64 );
-      assert_float_eq!(1e-15, x2, (-1f64 + 5f64.sqrt()) / 2f64 );
-      assert_float_eq!(1e-15, x3, 1f64 );
+    Roots::Three(x) => {
+      assert_float_array_eq!(1e-15, x, [(-1f64 - 5f64.sqrt()) / 2f64,(-1f64 + 5f64.sqrt()) / 2f64,1f64] );
     },
     _ => { assert!(false); }
   }

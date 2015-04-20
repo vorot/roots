@@ -22,7 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use super::super::FloatWithConstants;
+use super::super::FloatType;
 use super::super::Roots;
 
 /// Solves a linear equation a1*x + a0 = 0.
@@ -37,15 +37,15 @@ use super::super::Roots;
 /// let no_root = find_roots_linear(0f32, 1f32);
 /// assert_eq!(no_root, Roots::No([]));
 ///
-/// // Returns [0f64] as '1*x + 0 = 0' has the root 0
+/// // Returns Roots::Two([0f64]) as '1*x + 0 = 0' has the root 0
 /// let root = find_roots_linear(1f64, 0f64);
 /// assert_eq!(root, Roots::One([0f64]));
 ///
-/// // Returns [0f32] as 0 is one of roots of '0*x + 0 = 0'
+/// // Returns Roots::One([0f32]) as 0 is one of roots of '0*x + 0 = 0'
 /// let zero_root = find_roots_linear(0f32, 0f32);
 /// assert_eq!(zero_root, Roots::One([0f32]));
 /// ```
-pub fn find_roots_linear<F:FloatWithConstants>(a1:F, a0:F) -> Roots<F> {
+pub fn find_roots_linear<F:FloatType>(a1:F, a0:F) -> Roots<F> {
   if a1 == F::zero() {
     if a0 == F::zero() {
       Roots::One([F::zero()])

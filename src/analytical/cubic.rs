@@ -22,7 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use super::super::FloatWithConstants;
+use super::super::FloatType;
 use super::super::Roots;
 
 /// Solves a cubic equation a3*x^3 + a2*x^2 + a1*x + a0 = 0.
@@ -44,7 +44,7 @@ use super::super::Roots;
 /// let three_roots = find_roots_cubic(1f32, 0f32, -1f32, 0f32);
 /// // Returns Roots::Three([-1f32, 0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
-pub fn find_roots_cubic<F:FloatWithConstants>(a3:F, a2:F, a1:F, a0:F) -> Roots<F> {
+pub fn find_roots_cubic<F:FloatType>(a3:F, a2:F, a1:F, a0:F) -> Roots<F> {
   // Handle non-standard cases
   if a3 == F::zero() {
     // a3 = 0; a2*x^2+a1*x+a0=0; solve quadratic equation
@@ -63,10 +63,8 @@ fn test_find_roots_cubic() {
   assert_eq!(find_roots_cubic(1f32, 0f32, 0f32, 0f32), Roots::One([0f32]));
 
   match find_roots_cubic(1f64, 0f64, -1f64, 0f64) {
-    Roots::Three([x1, x2, x3]) => {
-      assert_float_eq!(1e-15, x1, -1f64 );
-      assert_float_eq!(1e-15, x2, 0f64 );
-      assert_float_eq!(1e-15, x3, 1f64 );
+    Roots::Three(x) => {
+      assert_float_array_eq!(1e-15, x, [-1f64,0f64,1f64] );
     },
     _ => { assert!(false); }
   }

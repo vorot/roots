@@ -22,7 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use super::super::FloatWithConstants;
+use super::super::FloatType;
 use super::super::Roots;
 
 /// Solves a quadratic equation a2*x^2 + a1*x + a0 = 0.
@@ -36,15 +36,15 @@ use super::super::Roots;
 /// use roots::find_roots_quadratic;
 ///
 /// let no_roots = find_roots_quadratic(1f32, 0f32, 1f32);
-/// // Returns [] as 'x^2 + 1 = 0' has no roots
+/// // Returns Roots::No([]) as 'x^2 + 1 = 0' has no roots
 ///
 /// let one_root = find_roots_quadratic(1f64, 0f64, 0f64);
-/// // Returns [0f64] as 'x^2 = 0' has one root 0
+/// // Returns Roots::One([0f64]) as 'x^2 = 0' has one root 0
 ///
 /// let two_roots = find_roots_quadratic(1f32, 0f32, -1f32);
-/// // Returns [-1f32,1f32] as 'x^2 - 1 = 0' has roots -1 and 1
+/// // Returns Roots::Two([-1f32,1f32]) as 'x^2 - 1 = 0' has roots -1 and 1
 /// ```
-pub fn find_roots_quadratic<F:FloatWithConstants>(a2:F, a1:F, a0:F) -> Roots<F> {
+pub fn find_roots_quadratic<F:FloatType>(a2:F, a1:F, a0:F) -> Roots<F> {
   // Handle non-standard cases
   if a2 == F::zero() {
     // a2 = 0; a1*x+a0=0; solve linear equation

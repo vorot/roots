@@ -22,7 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::num::Float;
+use super::FloatType;
 
 /// Possible errors
 #[derive(Debug,PartialEq)]
@@ -39,7 +39,7 @@ pub enum SearchError {
 
 /// The way to check if the algorithm has finished by either finding a root
 /// or reaching the iteration limit.
-pub trait Convergency<F:Float> {
+pub trait Convergency<F:FloatType> {
   /// Return true if the given Y value is close enough to the zero
   fn is_root_found(&self, y:F) -> bool;
   /// Return true if given x values are close enough to each other

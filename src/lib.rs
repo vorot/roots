@@ -24,15 +24,12 @@
 
 //#![crate_id = "roots"]
 #![crate_type = "lib"]
-#![feature(std_misc)]
-#![feature(slice_patterns)]
-#![feature(convert)]
-#![feature(test)]
 
-//! A set of functions for finding roots of numerical equations.
+//! A set of functions to find real roots of numerical equations.
 //!
 //! This crate contains various algorithms for numerical and analytical solving
-//! 1-variable equations like f(x)=0.
+//! of 1-variable equations like f(x)=0. Only real roots are calculated.
+//! Multiple (double etc.) roots are considered as one root.
 //!
 //! # Use
 //!
@@ -41,11 +38,8 @@
 //! by implementing the Convergency trait.
 //! Functions find_roots_* return all roots of several simple equations at once.
 
-use std::num::Float;
-
 macro_rules! assert_float_eq(
     ($precision:expr, $given:expr , $expected:expr) => ({
-      use std::num::Float;
       match (&($precision), &($given), &($expected)) {
           (precision_val, given_val, expected_val) => {
             let diff = given_val-expected_val;
@@ -57,8 +51,24 @@ macro_rules! assert_float_eq(
     })
 );
 
+macro_rules! assert_float_array_eq(
+    ($precision:expr, $given:expr , $expected:expr) => ({
+      match (&($precision), &($given), &($expected)) {
+          (precision_val, given_val, expected_val) => {
+            assert_eq!(given_val.len(),expected_val.len());
+            for i in 0..given_val.len() {
+              assert_float_eq!(precision_val,given_val[i],expected_val[i]);
+            }
+          }
+      }
+    })
+);
+
 mod analytical;
 mod numerical;
+mod float;
+
+pub use self::float::FloatType;
 
 pub use self::analytical::roots::Roots;
 pub use self::analytical::linear::find_roots_linear;
@@ -78,46 +88,6 @@ pub use self::numerical::newton_raphson::find_root_newton_raphson;
 pub use self::numerical::brent::find_root_brent;
 pub use self::numerical::secant::find_root_secant;
 pub use self::numerical::regula_falsi::find_root_regula_falsi;
-
-/// Adds constants to the std::num::Float type
-pub trait FloatWithConstants:Float {
-  #[inline]
-  fn two() -> Self;
-  #[inline]
-  fn three() -> Self;
-  #[inline]
-  fn pi() -> Self;
-  #[inline]
-  fn one_third() -> Self { Self::one() / Self::three() }
-  #[inline]
-  fn four() -> Self { Self::two() + Self::two() }
-  #[inline]
-  fn five() -> Self { Self::two() + Self::three() }
-  #[inline]
-  fn nine() -> Self { Self::three() * Self::three() }
-  #[inline]
-  fn twenty_seven() -> Self { Self::nine() * Self::three() }
-  #[inline]
-  fn two_third_pi() -> Self { Self::pi() * Self::two() / Self::three() }
-}
-
-impl FloatWithConstants for f32 {
-  #[inline]
-  fn two() -> Self { 2f32 }
-  #[inline]
-  fn three() -> Self { 3f32 }
-  #[inline]
-  fn pi() -> Self { 3.1415926535897932384626433832795028841971693993751058209749445923078164062_f32 }
-}
-
-impl FloatWithConstants for f64 {
-  #[inline]
-  fn two() -> Self { 2f64 }
-  #[inline]
-  fn three() -> Self { 3f64 }
-  #[inline]
-  fn pi() -> Self { 3.1415926535897932384626433832795028841971693993751058209749445923078164062_f64 }
-}
 
 #[cfg(test)]
 mod bench;

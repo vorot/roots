@@ -22,8 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::fmt::Debug;
-use std::num::Float;
+use super::super::FloatType;
 use super::SearchError;
 use super::Convergency;
 
@@ -62,7 +61,7 @@ use super::Convergency;
 /// let root2 = find_root_newton_raphson(-10f64, &f, &d, &convergency);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_newton_raphson<F:Float+Debug>(start:F, f:&Fn(F)->F, d:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
+pub fn find_root_newton_raphson<F:FloatType>(start:F, f:&Fn(F)->F, d:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
   let mut x = start;
 
   let mut iter = 0;

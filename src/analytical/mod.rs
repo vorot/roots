@@ -31,5 +31,3 @@ pub mod biquadratic;
 pub mod quartic_depressed;
 pub mod quartic;
 pub mod roots;
-
-mod cbrt;

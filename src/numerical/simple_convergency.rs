@@ -22,19 +22,19 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::num::Float;
+use super::super::FloatType;
 use super::Convergency;
 
 /// A very basic convergency rules that must be sufficient for many cases.
 /// The absolute precision is the same for x and y axes, no relative precision.
-pub struct SimpleConvergency<F:Float>{
+pub struct SimpleConvergency<F:FloatType>{
   /// Precision for both X and Y axes
   pub eps: F,
   /// Maximum number of iterations
   pub max_iter: usize,
 }
 
-impl<F:Float> Convergency<F> for SimpleConvergency<F> {
+impl<F:FloatType> Convergency<F> for SimpleConvergency<F> {
   fn is_root_found(&self, y:F) -> bool { y.abs() < self.eps.abs() }
   fn is_converged(&self, x1:F, x2:F) -> bool { (x1-x2).abs() < self.eps.abs() }
   fn is_iteration_limit_reached(&self, iter:usize) -> bool { iter >= self.max_iter }

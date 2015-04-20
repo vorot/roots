@@ -23,13 +23,14 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use std::cell::Cell;
-use std::num::Float;
+use super::super::FloatType;
 use std::fmt::Display;
 use std::fmt::LowerExp;
 use super::Convergency;
 
 /// Convergency provider for debugging.
-pub struct DebugConvergency<F:Float>{
+/// It will print out the error at each iteration.
+pub struct DebugConvergency<F:FloatType>{
   /// Precision for both X and Y axes
   eps: F,
   /// Maximum number of iterations
@@ -38,7 +39,7 @@ pub struct DebugConvergency<F:Float>{
   iter: Cell<usize>,
 }
 
-impl<F:Float> DebugConvergency<F> {
+impl<F:FloatType> DebugConvergency<F> {
   pub fn new(eps: F, max_iter: usize) -> DebugConvergency<F> {
     DebugConvergency { eps:eps, max_iter:max_iter,iter:Cell::new(0) }
   }
@@ -52,7 +53,7 @@ impl<F:Float> DebugConvergency<F> {
   }
 }
 
-impl<F:Float+Display+LowerExp> Convergency<F> for DebugConvergency<F> {
+impl<F:FloatType+Display+LowerExp> Convergency<F> for DebugConvergency<F> {
   /// Prints the value being checked
   fn is_root_found(&self, y:F) -> bool { println!("#{} check root {:.15e}", self.iter.get(), y); y.abs() < self.eps.abs() }
   /// Prints values being checked

@@ -9,8 +9,7 @@
 // except according to those terms.
 
 use std::mem;
-use std::fmt::Debug;
-use std::num::Float;
+use super::super::FloatType;
 use super::SearchError;
 use super::Convergency;
 
@@ -47,7 +46,7 @@ use super::Convergency;
 /// let root2 = find_root_brent(-10f64, 0f64, &f, &convergency);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_brent<F:Float+Debug>(a:F, b:F, f:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
+pub fn find_root_brent<F:FloatType>(a:F, b:F, f:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
   let _2 = F::one() + F::one();
   let _3 = _2 + F::one();
   let _4 = _2 + _2;

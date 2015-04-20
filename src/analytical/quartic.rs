@@ -22,7 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use super::super::FloatWithConstants;
+use super::super::FloatType;
 use super::super::Roots;
 
 /// Solves a quartic equation a4*x^4 + a3*x^3 + a2*x^2 + a1*x + a0 = 0.
@@ -36,19 +36,19 @@ use super::super::Roots;
 /// use roots::find_roots_quartic;
 ///
 /// let one_root = find_roots_quartic(1f64, 0f64, 0f64, 0f64, 0f64);
-/// // Returns [0f64] as 'x^4 = 0' has one root 0
+/// // Returns Roots::One([0f64]) as 'x^4 = 0' has one root 0
 ///
 /// let two_roots = find_roots_quartic(1f32, 0f32, 0f32, 0f32, -1f32);
-/// // Returns [-1f32, 1f32] as 'x^4 - 1 = 0' has roots -1 and 1
+/// // Returns Roots::Two([-1f32, 1f32]) as 'x^4 - 1 = 0' has roots -1 and 1
 /// ```
-pub fn find_roots_quartic<F:FloatWithConstants>(a4:F, a3:F, a2:F, a1:F, a0:F) -> Roots<F> {
+pub fn find_roots_quartic<F:FloatType>(a4:F, a3:F, a2:F, a1:F, a0:F) -> Roots<F> {
   // Handle non-standard cases
   if a4 == F::zero() {
     // a4 = 0; a3*x^3 + a2*x^2 + a1*x + a0 = 0; solve cubic equation
     super::cubic::find_roots_cubic(a3, a2, a1, a0)
   } else if a0 == F::zero() {
     // a0 = 0; x^4 + a2*x^2 + a1*x = 0; reduce to cubic and arrange results
-    super::cubic::find_roots_cubic(a4, a3, a2, a1).add_sorted(F::zero())
+    super::cubic::find_roots_cubic(a4, a3, a2, a1).add_new_root(F::zero())
   } else if a1 == F::zero() && a3 == F::zero() {
     // a1 = 0, a3 =0; a4*x^4 + a2*x^2 + a0 = 0; solve bi-quadratic equation
     super::biquadratic::find_roots_biquadratic(a4, a2, a0)
@@ -70,38 +70,30 @@ pub fn find_roots_quartic<F:FloatWithConstants>(a4:F, a3:F, a2:F, a1:F, a0:F) ->
     let subst = -a3/(F::four()*a4);
     let (p, q, r) = ( (_8*b - _3*a_pow_2)/_8, (a_pow_3 - _4*a*b + _8*c)/_8, (_256*d - _3*a_pow_4 - _64*c*a + _16*a_pow_2*b)/_256);
 
-    match super::quartic_depressed::find_roots_quartic_depressed(p, q, r) {
-      Roots::No([]) => Roots::No([]),
-      Roots::One([x1]) => Roots::One([x1+subst]),
-      Roots::Two([x1,x2]) => Roots::Two([x1+subst,x2+subst]),
-      Roots::Three([x1,x2,x3]) => Roots::Three([x1+subst,x2+subst,x3+subst]),
-      Roots::Four([x1,x2,x3,x4]) => Roots::Four([x1+subst,x2+subst,x3+subst,x4+subst]),
+    let mut roots = Roots::No([]);
+    for x in super::quartic_depressed::find_roots_quartic_depressed(p, q, r).as_ref().iter() {
+      roots = roots.add_new_root(*x + subst);
     }
+    roots
   }
 }
 
 #[test]
-fn test_find_roots_quartic_array() {
+fn test_find_roots_quartic() {
   assert_eq!(find_roots_quartic(1f32, 0f32, 0f32, 0f32, 0f32), Roots::One([0f32]));
   assert_eq!(find_roots_quartic(1f64, 0f64, 0f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
   assert_eq!(find_roots_quartic(1f64, -10f64, 35f64, -50f64, 24f64), Roots::Four([1f64, 2f64, 3f64, 4f64]));
 
   match find_roots_quartic(3f64, 5f64, -5f64, -5f64, 2f64) {
-    Roots::Four([x1, x2, x3, x4]) => {
-      assert_float_eq!(1e-15f64, x1, -2f64 );
-      assert_float_eq!(1e-15f64, x2, -1f64 );
-      assert_float_eq!(1e-15f64, x3, 0.33333333333333333f64 );
-      assert_float_eq!(2e-15f64, x4, 1f64 );
+    Roots::Four(x) => {
+      assert_float_array_eq!(2e-15f64, x, [-2f64,-1f64,0.33333333333333333f64,1f64] );
     },
     _ => { assert!(false); }
   }
 
   match find_roots_quartic(3f32, 5f32, -5f32, -5f32, 2f32) {
-    Roots::Four([x1, x2, x3, x4]) => {
-      assert_float_eq!(5e-7, x1, -2f32 );
-      assert_float_eq!(5e-7, x2, -1f32 );
-      assert_float_eq!(5e-7, x3, 0.33333333333333333f32 );
-      assert_float_eq!(5e-7, x4, 1f32 );
+    Roots::Four(x) => {
+      assert_float_array_eq!(5e-7, x, [-2f32,-1f32,0.33333333333333333f32,1f32] );
     },
     _ => { assert!(false); }
   }

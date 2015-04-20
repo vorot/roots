@@ -22,8 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::fmt::Debug;
-use std::num::Float;
+use super::super::FloatType;
 use super::SearchError;
 use super::Convergency;
 
@@ -71,7 +70,7 @@ enum Edge {
 /// let root2 = find_root_regula_falsi(-10f64, 0f64, &f, &convergency);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_regula_falsi<F:Float+Debug>(a:F, b:F, f:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
+pub fn find_root_regula_falsi<F:FloatType>(a:F, b:F, f:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
   let _2 = F::one() + F::one();
   let (mut x1, mut x2) = if a > b { (b, a) } else { (a, b) };
   let mut y1 = f(x1);
