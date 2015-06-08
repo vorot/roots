@@ -86,10 +86,18 @@ pub fn find_root_secant<F:FloatType>(first:F, second:F, f:&Fn(F)->F, convergency
   }
 }
 
+#[cfg(test)]
+mod test
+{
+// extern crate test;
+// use self::test::Bencher;
+use super::*;
+use super::super::*;
+
 #[test]
 fn test_find_root_secant() {
   let f = |x| { 1f64*x*x - 1f64 };
-  let conv = super::debug_convergency::DebugConvergency::new(1e-15f64, 30);
+  let conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
   conv.reset();
   assert_float_eq!(1e-15f64, find_root_secant(10f64, 0f64, &f, &conv).ok().unwrap(), 1f64);
@@ -102,4 +110,16 @@ fn test_find_root_secant() {
   conv.reset();
   assert_eq!(find_root_secant(10f64, -10f64, &f, &conv), Err(SearchError::ZeroDerivative));
   assert_eq!(0, conv.get_iter_count());
+}
+
+// #[bench]
+// fn bench(b: &mut Bencher) {
+  // let conv = SimpleConvergency {eps:1e-15, max_iter:30};
+  // b.iter( || {
+    // for _x in 0..test::black_box(10) {
+      // let _y = find_root_secant(0f64, 10f64, &x2_min_1, &conv).ok().unwrap();
+    // }
+  // } );
+// }
+
 }

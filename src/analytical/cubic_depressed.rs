@@ -75,6 +75,13 @@ pub fn find_roots_cubic_depressed<F:FloatType>(a1:F, a0:F) -> Roots<F> {
   }
 }
 
+#[cfg(test)]
+mod test
+{
+// extern crate test;
+// use self::test::Bencher;
+use super::super::super::*;
+
 #[test]
 fn test_find_roots_cubic_depressed() {
   assert_eq!(find_roots_cubic_depressed(0f32, 0f32), Roots::One([0f32]));
@@ -100,4 +107,15 @@ fn test_find_roots_cubic_depressed() {
     },
     _ => { assert!(false); }
   }
+}
+
+// #[bench]
+// fn bench(b: &mut Bencher) {
+  // b.iter( || {
+    // for _x in 0..test::black_box(10) {
+      // let _y = find_roots_cubic_depressed(-2f64, 1f64);
+    // }
+  // } );
+// }
+
 }

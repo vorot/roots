@@ -57,9 +57,27 @@ pub fn find_roots_linear<F:FloatType>(a1:F, a0:F) -> Roots<F> {
   }
 }
 
+#[cfg(test)]
+mod test
+{
+// extern crate test;
+// use self::test::Bencher;
+use super::super::super::*;
+
 #[test]
 fn test_find_roots_linear() {
   assert_eq!(find_roots_linear(0f32, 0f32), Roots::One([0f32]));
   assert_eq!(find_roots_linear(2f64, 1f64), Roots::One([-0.5f64]));
   assert_eq!(find_roots_linear(0f32, 1f32), Roots::No([]));
+}
+
+// #[bench]
+// fn bench(b: &mut Bencher) {
+  // b.iter( || {
+    // for _x in 0..test::black_box(10) {
+      // let _y = find_roots_linear(2f64, 1f64);
+    // }
+  // } );
+// }
+
 }

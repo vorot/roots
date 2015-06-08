@@ -78,6 +78,13 @@ pub fn find_roots_quartic<F:FloatType>(a4:F, a3:F, a2:F, a1:F, a0:F) -> Roots<F>
   }
 }
 
+#[cfg(test)]
+mod test
+{
+// extern crate test;
+// use self::test::Bencher;
+use super::super::super::*;
+
 #[test]
 fn test_find_roots_quartic() {
   assert_eq!(find_roots_quartic(1f32, 0f32, 0f32, 0f32, 0f32), Roots::One([0f32]));
@@ -97,4 +104,15 @@ fn test_find_roots_quartic() {
     },
     _ => { assert!(false); }
   }
+}
+
+// #[bench]
+// fn bench(b: &mut Bencher) {
+  // b.iter( || {
+    // for _x in 0..test::black_box(10) {
+      // let _y = find_roots_quartic(3f64, 5f64, -5f64, -5f64, 2f64);
+    // }
+  // } );
+// }
+
 }
