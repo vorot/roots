@@ -8,10 +8,19 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::mem;
 use super::super::FloatType;
 use super::SearchError;
 use super::Convergency;
+
+
+/// Arrange two points so that the greatest value is first
+fn arrange<F: FloatType>(a: F, ya: F, b: F, yb: F) -> (F, F, F, F) {
+    if ya.abs() > yb.abs() {
+        (a, ya, b, yb)
+    } else {
+        (b, yb, a, ya)
+    }
+}
 
 /// Find a root of the function f(x) = 0 using the Brent method.
 ///
@@ -51,15 +60,9 @@ pub fn find_root_brent<F: FloatType>(a: F,
                                      f: &Fn(F) -> F,
                                      convergency: &Convergency<F>)
                                      -> (Result<F, SearchError>) {
-    let (mut a, mut ya) = (a, f(a));
-    let (mut b, mut yb) = (b, f(b));
+    let (mut a, mut ya, mut b, mut yb) = arrange(a, f(a), b, f(b));
     if ya * yb > F::zero() {
         return Err(SearchError::NoBracketing);
-    }
-
-    if ya.abs() < yb.abs() {
-        mem::swap(&mut a, &mut b);
-        mem::swap(&mut ya, &mut yb);
     }
 
     let (mut c, mut yc, mut d) = (a, ya, a);
@@ -101,15 +104,25 @@ pub fn find_root_brent<F: FloatType>(a: F,
         c = b;
         yc = yb;
         if ya * ys < F::zero() {
-            b = s;
+            // Root bracketed between a ans s
+            match arrange(a, f(a), s, ys) {
+                (_a, _ya, _b, _yb) => {
+                    a = _a;
+                    ya = _ya;
+                    b = _b;
+                    yb = _yb;
+                }
+            }
         } else {
-            a = s
-        }
-        ya = f(a);
-        yb = f(b);
-        if ya.abs() < yb.abs() {
-            mem::swap(&mut a, &mut b);
-            mem::swap(&mut ya, &mut yb);
+            // Root bracketed between s ans b
+            match arrange(s, ys, b, f(b)) {
+                (_a, _ya, _b, _yb) => {
+                    a = _a;
+                    ya = _ya;
+                    b = _b;
+                    yb = _yb;
+                }
+            }
         }
 
         iter = iter + 1;
