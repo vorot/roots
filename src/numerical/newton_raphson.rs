@@ -61,54 +61,66 @@ use super::Convergency;
 /// let root2 = find_root_newton_raphson(-10f64, &f, &d, &convergency);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_newton_raphson<F:FloatType>(start:F, f:&Fn(F)->F, d:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
-  let mut x = start;
+pub fn find_root_newton_raphson<F: FloatType>(start: F,
+                                              f: &Fn(F) -> F,
+                                              d: &Fn(F) -> F,
+                                              convergency: &Convergency<F>)
+                                              -> (Result<F, SearchError>) {
+    let mut x = start;
 
-  let mut iter = 0;
-  loop {
-    let f = f(x);
-    let d = d(x);
-    if convergency.is_root_found(f) { return Ok(x); }
-    // Derivative is 0; try to correct the bad starting point
-    if convergency.is_root_found(d) {
-      if iter == 0 {
-        x = x + F::one();
+    let mut iter = 0;
+    loop {
+        let f = f(x);
+        let d = d(x);
+        if convergency.is_root_found(f) {
+            return Ok(x);
+        }
+        // Derivative is 0; try to correct the bad starting point
+        if convergency.is_root_found(d) {
+            if iter == 0 {
+                x = x + F::one();
+                iter = iter + 1;
+                continue;
+            } else {
+                return Err(SearchError::ZeroDerivative);
+            }
+        }
+
+        let x1 = x - f / d;
+        if convergency.is_converged(x, x1) {
+            return Ok(x1);
+        }
+
+        x = x1;
         iter = iter + 1;
-        continue;
-      } else {
-        return Err(SearchError::ZeroDerivative);
-      }
+
+        if convergency.is_iteration_limit_reached(iter) {
+            return Err(SearchError::NoConvergency);
+        }
     }
-
-    let x1 = x - f /d;
-    if convergency.is_converged(x,x1) { return Ok(x1); }
-
-    x = x1;
-    iter = iter + 1;
-
-    if convergency.is_iteration_limit_reached(iter) { return Err(SearchError::NoConvergency); }
-  }
 }
 
 #[cfg(test)]
-mod test
-{
-use super::*;
-use super::super::*;
+mod test {
+    use super::*;
+    use super::super::*;
 
-#[test]
-fn test_find_root_newton_raphson() {
-  let f = |x| { 1f64*x*x - 1f64 };
-  let d = |x| { 2f64*x };
-  let conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
+    #[test]
+    fn test_find_root_newton_raphson() {
+        let f = |x| 1f64 * x * x - 1f64;
+        let d = |x| 2f64 * x;
+        let conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
-  conv.reset();
-  assert_float_eq!(1e-15f64, find_root_newton_raphson(10f64, &f, &d, &conv).ok().unwrap(), 1f64);
-  assert_eq!(8, conv.get_iter_count());
+        conv.reset();
+        assert_float_eq!(1e-15f64,
+                         find_root_newton_raphson(10f64, &f, &d, &conv).ok().unwrap(),
+                         1f64);
+        assert_eq!(8, conv.get_iter_count());
 
-  conv.reset();
-  assert_float_eq!(1e-15f64, find_root_newton_raphson(-10f64, &f, &d, &conv).ok().unwrap(), -1f64);
-  assert_eq!(8, conv.get_iter_count());
-}
-
+        conv.reset();
+        assert_float_eq!(1e-15f64,
+                         find_root_newton_raphson(-10f64, &f, &d, &conv).ok().unwrap(),
+                         -1f64);
+        assert_eq!(8, conv.get_iter_count());
+    }
 }

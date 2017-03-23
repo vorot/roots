@@ -60,54 +60,73 @@ use super::Convergency;
 /// let root2 = find_root_secant(-10f64, 0f64, &f, &convergency);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_secant<F:FloatType>(first:F, second:F, f:&Fn(F)->F, convergency:&Convergency<F>) -> (Result<F,SearchError>) {
-  let mut x1 = first;
-  let mut y1 = f(x1);
-  if convergency.is_root_found(y1) { return Ok(x1); }
-  let mut x2 = second;
-  let mut y2 = f(x2);
-  if convergency.is_root_found(y2) { return Ok(x2); }
+pub fn find_root_secant<F: FloatType>(first: F,
+                                      second: F,
+                                      f: &Fn(F) -> F,
+                                      convergency: &Convergency<F>)
+                                      -> (Result<F, SearchError>) {
+    let mut x1 = first;
+    let mut y1 = f(x1);
+    if convergency.is_root_found(y1) {
+        return Ok(x1);
+    }
+    let mut x2 = second;
+    let mut y2 = f(x2);
+    if convergency.is_root_found(y2) {
+        return Ok(x2);
+    }
 
-  let mut iter = 0;
-  loop {
-    if convergency.is_root_found(y1-y2) { return Err(SearchError::ZeroDerivative); }
-    let x = x2 - y2*(x2-x1)/(y2-y1);
-    if convergency.is_converged(x,x2) { return Ok(x); }
-    let y = f(x);
-    if convergency.is_root_found(y) { return Ok(x); }
+    let mut iter = 0;
+    loop {
+        if convergency.is_root_found(y1 - y2) {
+            return Err(SearchError::ZeroDerivative);
+        }
+        let x = x2 - y2 * (x2 - x1) / (y2 - y1);
+        if convergency.is_converged(x, x2) {
+            return Ok(x);
+        }
+        let y = f(x);
+        if convergency.is_root_found(y) {
+            return Ok(x);
+        }
 
-    x1 = x2;
-    y1 = y2;
-    x2 = x;
-    y2 = y;
+        x1 = x2;
+        y1 = y2;
+        x2 = x;
+        y2 = y;
 
-    iter = iter + 1;
-    if convergency.is_iteration_limit_reached(iter) { return Err(SearchError::NoConvergency); }
-  }
+        iter = iter + 1;
+        if convergency.is_iteration_limit_reached(iter) {
+            return Err(SearchError::NoConvergency);
+        }
+    }
 }
 
 #[cfg(test)]
-mod test
-{
-use super::*;
-use super::super::*;
+mod test {
+    use super::*;
+    use super::super::*;
 
-#[test]
-fn test_find_root_secant() {
-  let f = |x| { 1f64*x*x - 1f64 };
-  let conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
+    #[test]
+    fn test_find_root_secant() {
+        let f = |x| 1f64 * x * x - 1f64;
+        let conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
-  conv.reset();
-  assert_float_eq!(1e-15f64, find_root_secant(10f64, 0f64, &f, &conv).ok().unwrap(), 1f64);
-  assert_eq!(12, conv.get_iter_count());
+        conv.reset();
+        assert_float_eq!(1e-15f64,
+                         find_root_secant(10f64, 0f64, &f, &conv).ok().unwrap(),
+                         1f64);
+        assert_eq!(12, conv.get_iter_count());
 
-  conv.reset();
-  assert_float_eq!(1e-15f64, find_root_secant(-10f64, 0f64, &f, &conv).ok().unwrap(), -1f64);
-  assert_eq!(12, conv.get_iter_count());
+        conv.reset();
+        assert_float_eq!(1e-15f64,
+                         find_root_secant(-10f64, 0f64, &f, &conv).ok().unwrap(),
+                         -1f64);
+        assert_eq!(12, conv.get_iter_count());
 
-  conv.reset();
-  assert_eq!(find_root_secant(10f64, -10f64, &f, &conv), Err(SearchError::ZeroDerivative));
-  assert_eq!(0, conv.get_iter_count());
-}
-
+        conv.reset();
+        assert_eq!(find_root_secant(10f64, -10f64, &f, &conv),
+                   Err(SearchError::ZeroDerivative));
+        assert_eq!(0, conv.get_iter_count());
+    }
 }

@@ -30,34 +30,51 @@ use super::Convergency;
 
 /// Convergency provider for debugging.
 /// It will print out the error at each iteration.
-pub struct DebugConvergency<F:FloatType>{
-  /// Precision for both X and Y axes
-  eps: F,
-  /// Maximum number of iterations
-  max_iter: usize,
-  /// Last iteration
-  iter: Cell<usize>,
+pub struct DebugConvergency<F: FloatType> {
+    /// Precision for both X and Y axes
+    eps: F,
+    /// Maximum number of iterations
+    max_iter: usize,
+    /// Last iteration
+    iter: Cell<usize>,
 }
 
-impl<F:FloatType> DebugConvergency<F> {
-  pub fn new(eps: F, max_iter: usize) -> DebugConvergency<F> {
-    DebugConvergency { eps:eps, max_iter:max_iter,iter:Cell::new(0) }
-  }
+impl<F: FloatType> DebugConvergency<F> {
+    pub fn new(eps: F, max_iter: usize) -> DebugConvergency<F> {
+        DebugConvergency {
+            eps: eps,
+            max_iter: max_iter,
+            iter: Cell::new(0),
+        }
+    }
 
-  pub fn reset(self: &DebugConvergency<F>) {
-    self.iter.set(0);
-  }
+    pub fn reset(self: &DebugConvergency<F>) {
+        self.iter.set(0);
+    }
 
-  pub fn get_iter_count(self: &DebugConvergency<F>) -> usize {
-    self.iter.get()
-  }
+    pub fn get_iter_count(self: &DebugConvergency<F>) -> usize {
+        self.iter.get()
+    }
 }
 
-impl<F:FloatType+Display+LowerExp> Convergency<F> for DebugConvergency<F> {
-  /// Prints the value being checked
-  fn is_root_found(&self, y:F) -> bool { println!("#{} check root {:.15e}", self.iter.get(), y); y.abs() < self.eps.abs() }
-  /// Prints values being checked
-  fn is_converged(&self, x1:F, x2:F) -> bool { println!("#{} check convergency {:.15e}-{:.15e}", self.iter.get(), x1, x2); (x1-x2).abs() < self.eps.abs() }
-  /// Updates internal iteration counter
-  fn is_iteration_limit_reached(&self, iter:usize) -> bool { println!("#{} check iteration limit {}", self.iter.get(), iter); self.iter.set(iter); iter >= self.max_iter }
+impl<F: FloatType + Display + LowerExp> Convergency<F> for DebugConvergency<F> {
+    /// Prints the value being checked
+    fn is_root_found(&self, y: F) -> bool {
+        println!("#{} check root {:.15e}", self.iter.get(), y);
+        y.abs() < self.eps.abs()
+    }
+    /// Prints values being checked
+    fn is_converged(&self, x1: F, x2: F) -> bool {
+        println!("#{} check convergency {:.15e}-{:.15e}",
+                 self.iter.get(),
+                 x1,
+                 x2);
+        (x1 - x2).abs() < self.eps.abs()
+    }
+    /// Updates internal iteration counter
+    fn is_iteration_limit_reached(&self, iter: usize) -> bool {
+        println!("#{} check iteration limit {}", self.iter.get(), iter);
+        self.iter.set(iter);
+        iter >= self.max_iter
+    }
 }

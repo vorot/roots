@@ -45,28 +45,26 @@ use super::super::Roots;
 /// let zero_root = find_roots_linear(0f32, 0f32);
 /// assert_eq!(zero_root, Roots::One([0f32]));
 /// ```
-pub fn find_roots_linear<F:FloatType>(a1:F, a0:F) -> Roots<F> {
-  if a1 == F::zero() {
-    if a0 == F::zero() {
-      Roots::One([F::zero()])
+pub fn find_roots_linear<F: FloatType>(a1: F, a0: F) -> Roots<F> {
+    if a1 == F::zero() {
+        if a0 == F::zero() {
+            Roots::One([F::zero()])
+        } else {
+            Roots::No([])
+        }
     } else {
-      Roots::No([])
+        Roots::One([-a0 / a1])
     }
-  } else {
-    Roots::One([-a0/a1])
-  }
 }
 
 #[cfg(test)]
-mod test
-{
-use super::super::super::*;
+mod test {
+    use super::super::super::*;
 
-#[test]
-fn test_find_roots_linear() {
-  assert_eq!(find_roots_linear(0f32, 0f32), Roots::One([0f32]));
-  assert_eq!(find_roots_linear(2f64, 1f64), Roots::One([-0.5f64]));
-  assert_eq!(find_roots_linear(0f32, 1f32), Roots::No([]));
-}
-
+    #[test]
+    fn test_find_roots_linear() {
+        assert_eq!(find_roots_linear(0f32, 0f32), Roots::One([0f32]));
+        assert_eq!(find_roots_linear(2f64, 1f64), Roots::One([-0.5f64]));
+        assert_eq!(find_roots_linear(0f32, 1f32), Roots::No([]));
+    }
 }

@@ -52,9 +52,9 @@ pub trait FloatType:Sized
   #[inline]
   fn pi() -> Self;
   #[inline]
-  fn one_third() -> Self { Self::one() / Self::three() }
+  fn one_third() -> Self;
   #[inline]
-  fn four() -> Self { Self::two() + Self::two() }
+  fn four() -> Self;
   #[inline]
   fn five() -> Self { Self::two() + Self::three() }
   #[inline]
@@ -64,7 +64,7 @@ pub trait FloatType:Sized
   #[inline]
   fn two_third_pi() -> Self;
   fn sqrt(self) -> Self;
-  /// The cubic root function is pow(x, 1/3) accepting negative arguments
+/// The cubic root function is pow(x, 1/3) accepting negative arguments
   fn cbrt(self) -> Self { if self < Self::zero() { -(-self).powf(Self::one_third()) } else { self.powf(Self::one_third()) } }
   fn acos(self) -> Self;
   fn cos(self) -> Self;
@@ -73,48 +73,108 @@ pub trait FloatType:Sized
 }
 
 impl FloatType for f32 {
-  #[inline]
-  fn zero() -> Self { 0f32 }
-  #[inline]
-  fn one() -> Self { 1f32 }
-  #[inline]
-  fn two() -> Self { 2f32 }
-  #[inline]
-  fn three() -> Self { 3f32 }
-  #[inline]
-  fn two_third_pi() -> Self { 2f32 * f32::consts::FRAC_PI_3 }
-  #[inline]
-  fn pi() -> Self { f32::consts::PI }
-  fn sqrt(self) -> Self { self.sqrt() }
-  fn acos(self) -> Self { self.acos() }
-  fn cos(self) -> Self { self.cos() }
-  fn abs(self) -> Self { self.abs() }
-  fn powf(self, n: Self) -> Self { self.powf(n) }
+    #[inline]
+    fn zero() -> Self {
+        0f32
+    }
+    #[inline]
+    fn one_third() -> Self {
+        1f32 / 3f32
+    }
+    #[inline]
+    fn one() -> Self {
+        1f32
+    }
+    #[inline]
+    fn two() -> Self {
+        2f32
+    }
+    #[inline]
+    fn three() -> Self {
+        3f32
+    }
+    #[inline]
+    fn four() -> Self {
+        4f32
+    }
+    #[inline]
+    fn two_third_pi() -> Self {
+        2f32 * f32::consts::FRAC_PI_3
+    }
+    #[inline]
+    fn pi() -> Self {
+        f32::consts::PI
+    }
+    fn sqrt(self) -> Self {
+        self.sqrt()
+    }
+    fn acos(self) -> Self {
+        self.acos()
+    }
+    fn cos(self) -> Self {
+        self.cos()
+    }
+    fn abs(self) -> Self {
+        self.abs()
+    }
+    fn powf(self, n: Self) -> Self {
+        self.powf(n)
+    }
 }
 
 impl FloatType for f64 {
-  #[inline]
-  fn zero() -> Self { 0f64 }
-  #[inline]
-  fn one() -> Self { 1f64 }
-  #[inline]
-  fn two() -> Self { 2f64 }
-  #[inline]
-  fn three() -> Self { 3f64 }
-  #[inline]
-  fn two_third_pi() -> Self { 2f64 * f64::consts::FRAC_PI_3 }
-  #[inline]
-  fn pi() -> Self { f64::consts::PI }
-  fn sqrt(self) -> Self { self.sqrt() }
-  fn acos(self) -> Self { self.acos() }
-  fn cos(self) -> Self { self.cos() }
-  fn abs(self) -> Self { self.abs() }
-  fn powf(self, n: Self) -> Self { self.powf(n) }
+    #[inline]
+    fn zero() -> Self {
+        0f64
+    }
+    #[inline]
+    fn one_third() -> Self {
+        1f64 / 3f64
+    }
+    #[inline]
+    fn one() -> Self {
+        1f64
+    }
+    #[inline]
+    fn two() -> Self {
+        2f64
+    }
+    #[inline]
+    fn three() -> Self {
+        3f64
+    }
+    #[inline]
+    fn four() -> Self {
+        4f64
+    }
+    #[inline]
+    fn two_third_pi() -> Self {
+        2f64 * f64::consts::FRAC_PI_3
+    }
+    #[inline]
+    fn pi() -> Self {
+        f64::consts::PI
+    }
+    fn sqrt(self) -> Self {
+        self.sqrt()
+    }
+    fn acos(self) -> Self {
+        self.acos()
+    }
+    fn cos(self) -> Self {
+        self.cos()
+    }
+    fn abs(self) -> Self {
+        self.abs()
+    }
+    fn powf(self, n: Self) -> Self {
+        self.powf(n)
+    }
 }
 
 #[test]
 fn test_float_cbrt() {
-  assert_eq!(-8f64.cbrt(), -2f64);
-  assert_eq!(8f64.cbrt(), 2f64);
-  assert_eq!(0f32.cbrt(), 0f32);
+    assert_eq!(-8f64.cbrt(), -2f64);
+    assert_eq!(8f64.cbrt(), 2f64);
+    assert_eq!(0f32.cbrt(), 0f32);
 }

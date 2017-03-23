@@ -27,25 +27,24 @@ use super::FloatType;
 /// Possible errors
 #[derive(Debug,PartialEq)]
 pub enum SearchError {
-  /// The algorithm could converge within the given number of iterations
-  NoConvergency,
-  /// Initial values do not bracket zero
-  NoBracketing,
-  /// The algorithm cannot continue from the point where the derivative is zero
-  ZeroDerivative,
-  // /// The algorithm is not yet implemented
-  // NotImplemented,
+    /// The algorithm could converge within the given number of iterations
+    NoConvergency,
+    /// Initial values do not bracket zero
+    NoBracketing,
+    /// The algorithm cannot continue from the point where the derivative is zero
+    ZeroDerivative, /* /// The algorithm is not yet implemented
+                     * NotImplemented, */
 }
 
 /// The way to check if the algorithm has finished by either finding a root
 /// or reaching the iteration limit.
-pub trait Convergency<F:FloatType> {
-  /// Return true if the given Y value is close enough to the zero
-  fn is_root_found(&self, y:F) -> bool;
-  /// Return true if given x values are close enough to each other
-  fn is_converged(&self, x1:F, x2:F) -> bool;
-  /// Return true if no more iterations desired
-  fn is_iteration_limit_reached(&self, iter:usize) -> bool;
+pub trait Convergency<F: FloatType> {
+    /// Return true if the given Y value is close enough to the zero
+    fn is_root_found(&self, y: F) -> bool;
+    /// Return true if given x values are close enough to each other
+    fn is_converged(&self, x1: F, x2: F) -> bool;
+    /// Return true if no more iterations desired
+    fn is_iteration_limit_reached(&self, iter: usize) -> bool;
 }
 
 pub mod newton_raphson;

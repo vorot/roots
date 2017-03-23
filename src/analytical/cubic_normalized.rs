@@ -40,75 +40,85 @@ use super::super::Roots;
 /// let three_roots = find_roots_cubic_normalized(0f32, -1f32, 0f32);
 /// // Returns Roots::Three([-1f32, -0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
-pub fn find_roots_cubic_normalized<F:FloatType>(a2:F, a1:F, a0:F) -> Roots<F> {
-  let q = (F::three()*a1 - a2*a2) / F::nine();
-  let r = (F::nine()*a2*a1 - F::twenty_seven()*a0 - F::two()*a2*a2*a2) / (F::two()*F::twenty_seven());
-  let q3 = q*q*q;
-  let d = q3 + r*r;
-  let a2_div_3 = a2 / F::three();
+pub fn find_roots_cubic_normalized<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<F> {
+    let q = (F::three() * a1 - a2 * a2) / F::nine();
+    let r = (F::nine() * a2 * a1 - F::twenty_seven() * a0 - F::two() * a2 * a2 * a2) /
+            (F::two() * F::twenty_seven());
+    let q3 = q * q * q;
+    let d = q3 + r * r;
+    let a2_div_3 = a2 / F::three();
 
-  if d < F::zero() {
-    let phi_3 = (r/(-q3).sqrt()).acos() / F::three();
-    let sqrt_q_2 = F::two()*(-q).sqrt();
+    if d < F::zero() {
+        let phi_3 = (r / (-q3).sqrt()).acos() / F::three();
+        let sqrt_q_2 = F::two() * (-q).sqrt();
 
-    Roots::One([sqrt_q_2*phi_3.cos() - a2_div_3])
-      .add_new_root(sqrt_q_2*(phi_3 - F::two_third_pi()).cos() - a2_div_3)
-      .add_new_root(sqrt_q_2*(phi_3 + F::two_third_pi()).cos() - a2_div_3)
-  } else {
-    let sqrt_d = d.sqrt();
-    let s = (r + sqrt_d).cbrt();
-    let t = (r - sqrt_d).cbrt();
-
-    if s == t {
-      if s + t == F::zero() {
-        Roots::One([s + t - a2_div_3])
-      } else {
-        Roots::One([s + t - a2_div_3])
-          .add_new_root(-(s + t) / F::two() - a2_div_3)
-      }
+        Roots::One([sqrt_q_2 * phi_3.cos() - a2_div_3])
+            .add_new_root(sqrt_q_2 * (phi_3 - F::two_third_pi()).cos() - a2_div_3)
+            .add_new_root(sqrt_q_2 * (phi_3 + F::two_third_pi()).cos() - a2_div_3)
     } else {
-      Roots::One([s + t - a2_div_3])
+        let sqrt_d = d.sqrt();
+        let s = (r + sqrt_d).cbrt();
+        let t = (r - sqrt_d).cbrt();
+
+        if s == t {
+            if s + t == F::zero() {
+                Roots::One([s + t - a2_div_3])
+            } else {
+                Roots::One([s + t - a2_div_3]).add_new_root(-(s + t) / F::two() - a2_div_3)
+            }
+        } else {
+            Roots::One([s + t - a2_div_3])
+        }
     }
-  }
 }
 
 #[cfg(test)]
-mod test
-{
-use super::super::super::*;
+mod test {
+    use super::super::super::*;
 
-#[test]
-fn test_find_roots_cubic_normalized() {
-  assert_eq!(find_roots_cubic_normalized(0f32, 0f32, 0f32), Roots::One([0f32]));
+    #[test]
+    fn test_find_roots_cubic_normalized() {
+        assert_eq!(find_roots_cubic_normalized(0f32, 0f32, 0f32),
+                   Roots::One([0f32]));
 
-  match find_roots_cubic_normalized(0f64, -1f64, 0f64) {
-    Roots::Three(x) => {
-      assert_float_array_eq!(1e-15, x, [-1f64,0f64,1f64] );
-    },
-    _ => { assert!(false); }
-  }
+        match find_roots_cubic_normalized(0f64, -1f64, 0f64) {
+            Roots::Three(x) => {
+                assert_float_array_eq!(1e-15, x, [-1f64, 0f64, 1f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
 
-  match find_roots_cubic_normalized(1f64, -2f64, 2f64) {
-    Roots::One(x) => {
-      assert_float_array_eq!(1e-15, x, [-2.269530842081142770853135f64] );
-    },
-    _ => { assert!(false); }
-  }
+        match find_roots_cubic_normalized(1f64, -2f64, 2f64) {
+            Roots::One(x) => {
+                assert_float_array_eq!(1e-15, x, [-2.269530842081142770853135f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
 
-  match find_roots_cubic_normalized(0f64, -3f64, 2f64) {
-    Roots::Two(x) => {
-      assert_float_array_eq!(1e-15, x, [-2f64,1f64] );
-    },
-    _ => { assert!(false); }
-  }
+        match find_roots_cubic_normalized(0f64, -3f64, 2f64) {
+            Roots::Two(x) => {
+                assert_float_array_eq!(1e-15, x, [-2f64, 1f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
 
-  match find_roots_cubic_normalized(-2f64, -3f64, 2f64) {
-    Roots::Three(x) => {
-      assert_float_array_eq!(1e-15, x, [-1.342923082777170208054859f64,0.5293165801288393926136314f64,2.813606502648330815441228f64] );
-    },
-    _ => { assert!(false); }
-  }
-}
-
-
+        match find_roots_cubic_normalized(-2f64, -3f64, 2f64) {
+            Roots::Three(x) => {
+                assert_float_array_eq!(1e-15,
+                                       x,
+                                       [-1.342923082777170208054859f64,
+                                        0.5293165801288393926136314f64,
+                                        2.813606502648330815441228f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
 }

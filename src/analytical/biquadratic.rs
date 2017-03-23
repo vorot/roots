@@ -43,40 +43,40 @@ use super::super::Roots;
 /// let two_roots = find_roots_biquadratic(1f32, 0f32, -1f32);
 /// // Returns Roots::Two([-1f32, 1f32]) as 'x^4 - 1 = 0' has roots -1 and 1
 /// ```
-pub fn find_roots_biquadratic<F:FloatType>(a4:F, a2:F, a0:F) -> Roots<F> {
-  // Handle non-standard cases
-  if a4 == F::zero() {
-    // a4 = 0; a2*x^2 + a0 = 0; solve quadratic equation
-    super::quadratic::find_roots_quadratic(a2, F::zero(), a0)
-  } else if a0 == F::zero() {
-    // a0 = 0; a4*x^4 + a2*x^2 = 0; solve quadratic equation and add zero root
-    super::quadratic::find_roots_quadratic(a4, F::zero(), a2).add_new_root(F::zero())
-  } else {
-    // solve the corresponding quadratic equation and order roots
-    let mut roots = Roots::No([]);
-    for x in super::quadratic::find_roots_quadratic(a4, a2, a0).as_ref().iter() {
-      if *x > F::zero() {
-        let sqrt_x = x.sqrt();
-        roots = roots.add_new_root(-sqrt_x).add_new_root(sqrt_x);
-      } else if *x == F::zero() {
-        roots = roots.add_new_root(F::zero());
-      }
+pub fn find_roots_biquadratic<F: FloatType>(a4: F, a2: F, a0: F) -> Roots<F> {
+    // Handle non-standard cases
+    if a4 == F::zero() {
+        // a4 = 0; a2*x^2 + a0 = 0; solve quadratic equation
+        super::quadratic::find_roots_quadratic(a2, F::zero(), a0)
+    } else if a0 == F::zero() {
+        // a0 = 0; a4*x^4 + a2*x^2 = 0; solve quadratic equation and add zero root
+        super::quadratic::find_roots_quadratic(a4, F::zero(), a2).add_new_root(F::zero())
+    } else {
+        // solve the corresponding quadratic equation and order roots
+        let mut roots = Roots::No([]);
+        for x in super::quadratic::find_roots_quadratic(a4, a2, a0).as_ref().iter() {
+            if *x > F::zero() {
+                let sqrt_x = x.sqrt();
+                roots = roots.add_new_root(-sqrt_x).add_new_root(sqrt_x);
+            } else if *x == F::zero() {
+                roots = roots.add_new_root(F::zero());
+            }
+        }
+        roots
     }
-    roots
-  }
 }
 
 #[cfg(test)]
-mod test
-{
-use super::super::super::*;
+mod test {
+    use super::super::super::*;
 
-#[test]
-fn test_find_roots_biquadratic() {
-  assert_eq!(find_roots_biquadratic(0f32, 0f32, 0f32), Roots::One([0f32]));
-  assert_eq!(find_roots_biquadratic(1f32, 0f32, 1f32), Roots::No([]));
-  assert_eq!(find_roots_biquadratic(1f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
-  assert_eq!(find_roots_biquadratic(1f64, -5f64, 4f64), Roots::Four([-2f64, -1f64, 1f64, 2f64]));
-}
-
+    #[test]
+    fn test_find_roots_biquadratic() {
+        assert_eq!(find_roots_biquadratic(0f32, 0f32, 0f32), Roots::One([0f32]));
+        assert_eq!(find_roots_biquadratic(1f32, 0f32, 1f32), Roots::No([]));
+        assert_eq!(find_roots_biquadratic(1f64, 0f64, -1f64),
+                   Roots::Two([-1f64, 1f64]));
+        assert_eq!(find_roots_biquadratic(1f64, -5f64, 4f64),
+                   Roots::Four([-2f64, -1f64, 1f64, 2f64]));
+    }
 }

@@ -44,36 +44,35 @@ use super::super::Roots;
 /// let three_roots = find_roots_cubic(1f32, 0f32, -1f32, 0f32);
 /// // Returns Roots::Three([-1f32, 0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
-pub fn find_roots_cubic<F:FloatType>(a3:F, a2:F, a1:F, a0:F) -> Roots<F> {
-  // Handle non-standard cases
-  if a3 == F::zero() {
-    // a3 = 0; a2*x^2+a1*x+a0=0; solve quadratic equation
-    super::quadratic::find_roots_quadratic(a2, a1, a0)
-  } else if a2 == F::zero() {
-    // a2 = 0; a3*x^3+a1*x+a0=0; solve depressed cubic equation
-    super::cubic_depressed::find_roots_cubic_depressed(a1/a3, a0/a3)
-  } else {
-    // solve normalized cubic expression
-    super::cubic_normalized::find_roots_cubic_normalized(a2/a3, a1/a3, a0/a3)
-  }
+pub fn find_roots_cubic<F: FloatType>(a3: F, a2: F, a1: F, a0: F) -> Roots<F> {
+    // Handle non-standard cases
+    if a3 == F::zero() {
+        // a3 = 0; a2*x^2+a1*x+a0=0; solve quadratic equation
+        super::quadratic::find_roots_quadratic(a2, a1, a0)
+    } else if a2 == F::zero() {
+        // a2 = 0; a3*x^3+a1*x+a0=0; solve depressed cubic equation
+        super::cubic_depressed::find_roots_cubic_depressed(a1 / a3, a0 / a3)
+    } else {
+        // solve normalized cubic expression
+        super::cubic_normalized::find_roots_cubic_normalized(a2 / a3, a1 / a3, a0 / a3)
+    }
 }
 
 #[cfg(test)]
-mod test
-{
-use super::super::super::*;
+mod test {
+    use super::super::super::*;
 
-#[test]
-fn test_find_roots_cubic() {
-  assert_eq!(find_roots_cubic(1f32, 0f32, 0f32, 0f32), Roots::One([0f32]));
+    #[test]
+    fn test_find_roots_cubic() {
+        assert_eq!(find_roots_cubic(1f32, 0f32, 0f32, 0f32), Roots::One([0f32]));
 
-  match find_roots_cubic(1f64, 0f64, -1f64, 0f64) {
-    Roots::Three(x) => {
-      assert_float_array_eq!(1e-15, x, [-1f64,0f64,1f64] );
-    },
-    _ => { assert!(false); }
-  }
-}
-
-
+        match find_roots_cubic(1f64, 0f64, -1f64, 0f64) {
+            Roots::Three(x) => {
+                assert_float_array_eq!(1e-15, x, [-1f64, 0f64, 1f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
 }
