@@ -14,3 +14,10 @@ keywords = [ "math", "root", "numerical", "cubic", "quartic" ]
 [lib]
 name = "roots"
 path = "src/lib.rs"
+
+[dev-dependencies]
+bencher = "0.1.2"
+
+[[bench]]
+name="benches"
+harness=false

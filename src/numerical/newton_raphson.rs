@@ -93,8 +93,6 @@ pub fn find_root_newton_raphson<F:FloatType>(start:F, f:&Fn(F)->F, d:&Fn(F)->F, 
 #[cfg(test)]
 mod test
 {
-// extern crate test;
-// use self::test::Bencher;
 use super::*;
 use super::super::*;
 
@@ -112,15 +110,5 @@ fn test_find_root_newton_raphson() {
   assert_float_eq!(1e-15f64, find_root_newton_raphson(-10f64, &f, &d, &conv).ok().unwrap(), -1f64);
   assert_eq!(8, conv.get_iter_count());
 }
-
-// #[bench]
-// fn bench(b: &mut Bencher) {
-  // let conv = SimpleConvergency {eps:1e-15, max_iter:30};
-  // b.iter( || {
-    // for _x in 0..test::black_box(10) {
-      // let _y = find_root_newton_raphson(10f64, &x2_min_1, &x2_min_1_d, &conv).ok().unwrap();
-    // }
-  // } );
-// }
 
 }

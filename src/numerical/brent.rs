@@ -109,8 +109,6 @@ pub fn find_root_brent<F:FloatType>(a:F, b:F, f:&Fn(F)->F, convergency:&Converge
 #[cfg(test)]
 mod test
 {
-// extern crate test;
-// use self::test::Bencher;
 use super::*;
 use super::super::*;
 
@@ -131,15 +129,5 @@ fn test_find_root_brent() {
   assert_eq!(find_root_brent(10f64, 20f64, &f, &conv), Err(SearchError::NoBracketing));
   assert_eq!(0, conv.get_iter_count());
 }
-
-// #[bench]
-// fn bench(b: &mut Bencher) {
-  // let conv = SimpleConvergency {eps:1e-15, max_iter:30};
-  // b.iter( || {
-    // for _x in 0..test::black_box(10) {
-      // let _y = find_root_brent(0f64, 10f64, &x2_min_1, &conv).ok().unwrap();
-    // }
-  // } );
-// }
 
 }

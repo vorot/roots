@@ -69,8 +69,6 @@ pub fn find_roots_quadratic<F:FloatType>(a2:F, a1:F, a0:F) -> Roots<F> {
 #[cfg(test)]
 mod test
 {
-// extern crate test;
-// use self::test::Bencher;
 use super::super::super::*;
 
 #[test]
@@ -79,14 +77,5 @@ fn test_find_roots_quadratic() {
   assert_eq!(find_roots_quadratic(1f32, 0f32, 1f32), Roots::No([]));
   assert_eq!(find_roots_quadratic(1f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
 }
-
-// #[bench]
-// fn bench(b: &mut Bencher) {
-  // b.iter( || {
-    // for _x in 0..test::black_box(10) {
-      // let _y = find_roots_quadratic(1f64, 0f64, -1f64);
-    // }
-  // } );
-// }
 
 }

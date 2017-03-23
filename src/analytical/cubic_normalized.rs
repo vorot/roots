@@ -75,8 +75,6 @@ pub fn find_roots_cubic_normalized<F:FloatType>(a2:F, a1:F, a0:F) -> Roots<F> {
 #[cfg(test)]
 mod test
 {
-// extern crate test;
-// use self::test::Bencher;
 use super::super::super::*;
 
 #[test]
@@ -112,13 +110,5 @@ fn test_find_roots_cubic_normalized() {
   }
 }
 
-// #[bench]
-// fn bench(b: &mut Bencher) {
-  // b.iter( || {
-    // for _x in 0..test::black_box(10) {
-      // let _y = find_roots_cubic_normalized(-2f64, -3f64, 2f64);
-    // }
-  // } );
-// }
 
 }
