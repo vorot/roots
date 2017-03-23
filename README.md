@@ -1,16 +1,15 @@
-[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)[![Build Status](https://travis-ci.org/vorot/roots.svg)](https://travis-ci.org/vorot/roots)[![Crates.io](https://img.shields.io/crates/v/roots.svg)](https://crates.io/crates/roots)
-
-#roots
-
 Library of well known algorithms for numerical root finding.
 
+[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)[![Build Status](https://travis-ci.org/vorot/roots.svg)](https://travis-ci.org/vorot/roots)[![Crates.io](https://img.shields.io/crates/v/roots.svg)](https://crates.io/crates/roots)
+
 ## Features
-  - Iterative approximation:
+
+- Iterative approximation:
    - [Newton-Raphson](http://en.wikipedia.org/wiki/Newton%27s_method) method
    - [Secant](http://en.wikipedia.org/wiki/Secant_method) method
    - [Regula falsi](http://en.wikipedia.org/wiki/False_position_method) method (with Illinois modification)
    - [Brent-Dekker](http://en.wikipedia.org/wiki/Brent%27s_method) method
-  - Solving polynomial equations
+- Solving polynomial equations
    - [Linear](http://en.wikipedia.org/wiki/Linear_equation) equation (editors' choice)
    - [Quadratic](http://en.wikipedia.org/wiki/Quadratic_equation) equation
    - [Cubic](http://en.wikipedia.org/wiki/Cubic_function) equation
