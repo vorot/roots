@@ -57,7 +57,7 @@ use super::Convergency;
 /// let root1 = find_root_secant(10f64, 0f64, &f, &mut convergency);
 /// // Returns approximately Ok(1);
 ///
-/// let root2 = find_root_secant(-10f64, 0f64, &f, &mut convergency);
+/// let root2 = find_root_secant(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
 pub fn find_root_secant<F: FloatType>(first: F,

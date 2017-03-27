@@ -52,7 +52,7 @@ fn arrange<F: FloatType>(a: F, ya: F, b: F, yb: F) -> (F, F, F, F) {
 /// let root1 = find_root_brent(10f64, 0f64, &f, &mut convergency);
 /// // Returns approximately Ok(1);
 ///
-/// let root2 = find_root_brent(-10f64, 0f64, &f, &mut convergency);
+/// let root2 = find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
 pub fn find_root_brent<F: FloatType>(a: F,
@@ -158,5 +158,21 @@ mod test {
         assert_eq!(find_root_brent(10f64, 20f64, &f, &mut conv),
                    Err(SearchError::NoBracketing));
         assert_eq!(0, conv.get_iter_count());
+    }
+
+    #[test]
+    fn test_find_root_brent_simple() {
+        let f = |x| 1f64 * x * x - 1f64;
+
+        assert_float_eq!(1e-15f64,
+                         find_root_brent(10f64, 0f64, &f, &mut 1e-15f64).ok().unwrap(),
+                         1f64);
+
+        assert_float_eq!(1e-15f64,
+                         find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64).ok().unwrap(),
+                         -1f64);
+
+        assert_eq!(find_root_brent(10f64, 20f64, &f, &mut 1e-15f64),
+                   Err(SearchError::NoBracketing));
     }
 }

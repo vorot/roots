@@ -58,7 +58,7 @@ use super::Convergency;
 /// let root1 = find_root_newton_raphson(10f64, &f, &d, &mut convergency);
 /// // Returns approximately Ok(1);
 ///
-/// let root2 = find_root_newton_raphson(-10f64, &f, &d, &mut convergency);
+/// let root2 = find_root_newton_raphson(-10f64, &f, &d, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
 pub fn find_root_newton_raphson<F: FloatType>(start: F,

@@ -47,6 +47,21 @@ pub trait Convergency<F: FloatType> {
     fn is_iteration_limit_reached(&mut self, iter: usize) -> bool;
 }
 
+impl<F: FloatType> Convergency<F> for F {
+    /// Return true if the given Y value is close enough to the zero
+    fn is_root_found(&mut self, y: F) -> bool {
+        y.abs() < self.abs()
+    }
+    /// Return true if given x values are close enough to each other
+    fn is_converged(&mut self, x1: F, x2: F) -> bool {
+        (x1 - x2).abs() < self.abs()
+    }
+    /// Return true if no more iterations desired
+    fn is_iteration_limit_reached(&mut self, iter: usize) -> bool {
+        iter >= 30
+    }
+}
+
 pub mod newton_raphson;
 pub mod brent;
 pub mod secant;

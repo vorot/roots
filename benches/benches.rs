@@ -30,7 +30,6 @@ use roots::find_root_secant;
 use roots::find_root_brent;
 use roots::find_root_regula_falsi;
 use roots::find_root_newton_raphson;
-use roots::SimpleConvergency;
 use roots::find_roots_quadratic;
 use roots::find_roots_biquadratic;
 use roots::find_roots_quartic;
@@ -52,109 +51,71 @@ fn x4_min_1_derivative(x: f64) -> f64 {
 }
 
 fn secant_x2_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_secant(0f64, 10f64, &x2_min_1, &conv).ok().unwrap();
+            let _y = find_root_secant(0f64, 10f64, &x2_min_1, &mut 1e-15f64).ok().unwrap();
         }
     });
 }
 
 fn secant_x4_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_secant(0f64, 10f64, &x4_min_1, &conv).ok().unwrap();
+            let _y = find_root_secant(0f64, 10f64, &x4_min_1, &mut 1e-15f64).ok().unwrap();
         }
     });
 }
 
 fn regula_falsi_x2_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_regula_falsi(0f64, 10f64, &x2_min_1, &conv).ok().unwrap();
+            let _y = find_root_regula_falsi(0f64, 10f64, &x2_min_1, &mut 1e-15f64).ok().unwrap();
         }
     });
 }
 
 fn regula_falsi_x4_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_regula_falsi(0f64, 10f64, &x4_min_1, &conv).ok().unwrap();
+            let _y = find_root_regula_falsi(0f64, 10f64, &x4_min_1, &mut 1e-15f64).ok().unwrap();
         }
     });
 }
 
 fn brent_x2_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_brent(0f64, 10f64, &x2_min_1, &conv).ok().unwrap();
+            let _y = find_root_brent(0f64, 10f64, &x2_min_1, &mut 1e-15f64).ok().unwrap();
         }
     });
 }
 
 fn brent_x4_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_brent(0f64, 10f64, &x4_min_1, &conv).ok().unwrap();
+            let _y = find_root_brent(0f64, 10f64, &x4_min_1, &mut 1e-15f64).ok().unwrap();
         }
     });
 }
 
 fn newton_raphson_x2_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_newton_raphson(0.5f64, &x2_min_1, &x2_min_1_derivative, &conv)
-                .ok()
-                .unwrap();
+            let _y =
+                find_root_newton_raphson(0.5f64, &x2_min_1, &x2_min_1_derivative, &mut 1e-15f64)
+                    .ok()
+                    .unwrap();
         }
     });
 }
 
 fn newton_raphson_x4_min_1_x1000(b: &mut Bencher) {
-    let conv = SimpleConvergency {
-        eps: 1e-15,
-        max_iter: 30,
-    };
-
     b.iter(|| {
         for _x in 0..1000 {
-            let _y = find_root_newton_raphson(0.5f64, &x4_min_1, &x4_min_1_derivative, &conv)
-                .ok()
-                .unwrap();
+            let _y =
+                find_root_newton_raphson(0.5f64, &x4_min_1, &x4_min_1_derivative, &mut 1e-15f64)
+                    .ok()
+                    .unwrap();
         }
     });
 }
