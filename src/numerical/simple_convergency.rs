@@ -35,13 +35,13 @@ pub struct SimpleConvergency<F: FloatType> {
 }
 
 impl<F: FloatType> Convergency<F> for SimpleConvergency<F> {
-    fn is_root_found(&self, y: F) -> bool {
+    fn is_root_found(&mut self, y: F) -> bool {
         y.abs() < self.eps.abs()
     }
-    fn is_converged(&self, x1: F, x2: F) -> bool {
+    fn is_converged(&mut self, x1: F, x2: F) -> bool {
         (x1 - x2).abs() < self.eps.abs()
     }
-    fn is_iteration_limit_reached(&self, iter: usize) -> bool {
+    fn is_iteration_limit_reached(&mut self, iter: usize) -> bool {
         iter >= self.max_iter
     }
 }

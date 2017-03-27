@@ -53,18 +53,18 @@ use super::Convergency;
 ///
 /// let f = |x| { 1f64*x*x - 1f64 };
 /// let d = |x| { 2f64*x };
-/// let convergency = SimpleConvergency { eps:1e-15f64, max_iter:30 };
+/// let mut convergency = SimpleConvergency { eps:1e-15f64, max_iter:30 };
 ///
-/// let root1 = find_root_newton_raphson(10f64, &f, &d, &convergency);
+/// let root1 = find_root_newton_raphson(10f64, &f, &d, &mut convergency);
 /// // Returns approximately Ok(1);
 ///
-/// let root2 = find_root_newton_raphson(-10f64, &f, &d, &convergency);
+/// let root2 = find_root_newton_raphson(-10f64, &f, &d, &mut convergency);
 /// // Returns approximately Ok(-1);
 /// ```
 pub fn find_root_newton_raphson<F: FloatType>(start: F,
                                               f: &Fn(F) -> F,
                                               d: &Fn(F) -> F,
-                                              convergency: &Convergency<F>)
+                                              convergency: &mut Convergency<F>)
                                               -> (Result<F, SearchError>) {
     let mut x = start;
 
@@ -109,17 +109,17 @@ mod test {
     fn test_find_root_newton_raphson() {
         let f = |x| 1f64 * x * x - 1f64;
         let d = |x| 2f64 * x;
-        let conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
+        let mut conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
         conv.reset();
         assert_float_eq!(1e-15f64,
-                         find_root_newton_raphson(10f64, &f, &d, &conv).ok().unwrap(),
+                         find_root_newton_raphson(10f64, &f, &d, &mut conv).ok().unwrap(),
                          1f64);
         assert_eq!(8, conv.get_iter_count());
 
         conv.reset();
         assert_float_eq!(1e-15f64,
-                         find_root_newton_raphson(-10f64, &f, &d, &conv).ok().unwrap(),
+                         find_root_newton_raphson(-10f64, &f, &d, &mut conv).ok().unwrap(),
                          -1f64);
         assert_eq!(8, conv.get_iter_count());
     }

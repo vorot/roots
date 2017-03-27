@@ -40,11 +40,11 @@ pub enum SearchError {
 /// or reaching the iteration limit.
 pub trait Convergency<F: FloatType> {
     /// Return true if the given Y value is close enough to the zero
-    fn is_root_found(&self, y: F) -> bool;
+    fn is_root_found(&mut self, y: F) -> bool;
     /// Return true if given x values are close enough to each other
-    fn is_converged(&self, x1: F, x2: F) -> bool;
+    fn is_converged(&mut self, x1: F, x2: F) -> bool;
     /// Return true if no more iterations desired
-    fn is_iteration_limit_reached(&self, iter: usize) -> bool;
+    fn is_iteration_limit_reached(&mut self, iter: usize) -> bool;
 }
 
 pub mod newton_raphson;

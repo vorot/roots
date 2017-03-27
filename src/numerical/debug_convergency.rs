@@ -22,7 +22,6 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use std::cell::Cell;
 use super::super::FloatType;
 use std::fmt::Display;
 use std::fmt::LowerExp;
@@ -36,7 +35,7 @@ pub struct DebugConvergency<F: FloatType> {
     /// Maximum number of iterations
     max_iter: usize,
     /// Last iteration
-    iter: Cell<usize>,
+    iter: usize,
 }
 
 impl<F: FloatType> DebugConvergency<F> {
@@ -44,37 +43,34 @@ impl<F: FloatType> DebugConvergency<F> {
         DebugConvergency {
             eps: eps,
             max_iter: max_iter,
-            iter: Cell::new(0),
+            iter: 0,
         }
     }
 
-    pub fn reset(self: &DebugConvergency<F>) {
-        self.iter.set(0);
+    pub fn reset(self: &mut DebugConvergency<F>) {
+        self.iter = 0;
     }
 
     pub fn get_iter_count(self: &DebugConvergency<F>) -> usize {
-        self.iter.get()
+        self.iter
     }
 }
 
 impl<F: FloatType + Display + LowerExp> Convergency<F> for DebugConvergency<F> {
     /// Prints the value being checked
-    fn is_root_found(&self, y: F) -> bool {
-        println!("#{} check root {:.15e}", self.iter.get(), y);
+    fn is_root_found(&mut self, y: F) -> bool {
+        println!("#{} check root {:.15e}", self.iter, y);
         y.abs() < self.eps.abs()
     }
     /// Prints values being checked
-    fn is_converged(&self, x1: F, x2: F) -> bool {
-        println!("#{} check convergency {:.15e}-{:.15e}",
-                 self.iter.get(),
-                 x1,
-                 x2);
+    fn is_converged(&mut self, x1: F, x2: F) -> bool {
+        println!("#{} check convergency {:.15e}-{:.15e}", self.iter, x1, x2);
         (x1 - x2).abs() < self.eps.abs()
     }
     /// Updates internal iteration counter
-    fn is_iteration_limit_reached(&self, iter: usize) -> bool {
-        println!("#{} check iteration limit {}", self.iter.get(), iter);
-        self.iter.set(iter);
+    fn is_iteration_limit_reached(&mut self, iter: usize) -> bool {
+        println!("#{} check iteration limit {}", self.iter, iter);
+        self.iter = iter;
         iter >= self.max_iter
     }
 }
