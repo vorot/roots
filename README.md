@@ -25,7 +25,9 @@ use roots::find_root_brent;
 use roots::find_root_secant;
 
 // Find the root of a complex function in the area determined by a simpler polynom
-fn find_solution(enormous_function: &Fn(f64)->f64, root_area_polynom:(f64,f64,f64,f64)) -> Option<f64> {
+fn find_solution<F>(enormous_function: F, root_area_polynom:(f64,f64,f64,f64)) -> Option<f64>
+  where F: Fn(f64) -> f64
+{
   // de-structure polynom coefficients
   match root_area_polynom {
     (a3,a2,a1,a0) => {
