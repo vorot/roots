@@ -70,11 +70,11 @@ enum Edge {
 /// let root2 = find_root_regula_falsi(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_regula_falsi<F: FloatType>(a: F,
-                                            b: F,
-                                            f: &Fn(F) -> F,
-                                            convergency: &mut Convergency<F>)
-                                            -> (Result<F, SearchError>) {
+pub fn find_root_regula_falsi<F, Func>(a: F, b: F, f: Func, convergency: &mut Convergency<F>)
+                                       -> Result<F, SearchError>
+    where F: FloatType,
+          Func: Fn(F) -> F
+{
     let (mut x1, mut x2) = if a > b { (b, a) } else { (a, b) };
     let mut y1 = f(x1);
     if convergency.is_root_found(y1) {
