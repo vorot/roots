@@ -61,11 +61,13 @@ use super::Convergency;
 /// let root2 = find_root_newton_raphson(-10f64, &f, &d, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_newton_raphson<F: FloatType>(start: F,
-                                              f: &Fn(F) -> F,
-                                              d: &Fn(F) -> F,
-                                              convergency: &mut Convergency<F>)
-                                              -> (Result<F, SearchError>) {
+pub fn find_root_newton_raphson<F, Func, Deriv>(start: F, f: Func, d: Deriv,
+                                                convergency: &mut Convergency<F>)
+                                                -> Result<F, SearchError>
+    where F: FloatType,
+          Func: Fn(F) -> F,
+          Deriv: Fn(F) -> F
+{
     let mut x = start;
 
     let mut iter = 0;
