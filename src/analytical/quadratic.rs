@@ -51,16 +51,44 @@ pub fn find_roots_quadratic<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<F> {
         super::linear::find_roots_linear(a1, a0)
     } else {
         // Rust lacks a simple way to convert an integer constant to generic type F
-        let a2x2 = F::two() * a2;
         let discriminant = a1 * a1 - F::four() * a2 * a0;
         if discriminant < F::zero() {
             Roots::No([])
         } else {
+            let a2x2 = F::two() * a2;
             if discriminant == F::zero() {
                 Roots::One([-a1 / a2x2])
             } else {
+                // To improve precision, do not use the smallest divisor.
+                // See https://people.csail.mit.edu/bkph/articles/Quadratics.pdf
                 let sq = discriminant.sqrt();
-                Roots::Two([(-a1 - sq) / a2x2, (-a1 + sq) / a2x2])
+
+                let (same_sign, diff_sign) = if a1 < F::zero() {
+                    (-a1 + sq, -a1 - sq)
+                } else {
+                    (-a1 - sq, -a1 + sq)
+                };
+
+                let (x1, x2) = if same_sign.abs() > a2x2.abs() {
+                    let a0x2 = F::two() * a0;
+                    if diff_sign.abs() > a2x2.abs() {
+                        // 2*a2 is the smallest divisor, do not use it
+                        (a0x2 / same_sign, a0x2 / diff_sign)
+                    } else {
+                        // diff_sign is the smallest divisor, do not use it
+                        (a0x2 / same_sign, same_sign / a2x2)
+                    }
+                } else {
+                    // 2*a2 is the greatest divisor, use it
+                    (diff_sign / a2x2, same_sign / a2x2)
+                };
+
+                // Order roots
+                if x1 < x2 {
+                    Roots::Two([x1, x2])
+                } else {
+                    Roots::Two([x2, x1])
+                }
             }
         }
     }
