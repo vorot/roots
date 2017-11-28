@@ -27,13 +27,12 @@ use super::FloatType;
 /// Possible errors
 #[derive(Debug,PartialEq)]
 pub enum SearchError {
-    /// The algorithm could converge within the given number of iterations
+    /// The algorithm could not converge within the given number of iterations
     NoConvergency,
     /// Initial values do not bracket zero
     NoBracketing,
     /// The algorithm cannot continue from the point where the derivative is zero
-    ZeroDerivative, /* /// The algorithm is not yet implemented
-                     * NotImplemented, */
+    ZeroDerivative,
 }
 
 /// The way to check if the algorithm has finished by either finding a root

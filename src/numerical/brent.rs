@@ -55,7 +55,10 @@ fn arrange<F: FloatType>(a: F, ya: F, b: F, yb: F) -> (F, F, F, F) {
 /// let root2 = find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_brent<F, Func>(a: F, b: F, f: Func, convergency: &mut Convergency<F>)
+pub fn find_root_brent<F, Func>(a: F,
+                                b: F,
+                                f: Func,
+                                convergency: &mut Convergency<F>)
                                 -> Result<F, SearchError>
     where F: FloatType,
           Func: Fn(F) -> F
