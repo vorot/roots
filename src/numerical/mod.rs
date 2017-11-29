@@ -65,6 +65,7 @@ pub mod newton_raphson;
 pub mod brent;
 pub mod secant;
 pub mod regula_falsi;
+pub mod polynom;
 
 pub mod simple_convergency;
 pub mod debug_convergency;

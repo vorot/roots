@@ -29,11 +29,13 @@ use std::ops::Sub;
 use std::ops::Mul;
 use std::ops::Div;
 use std::ops::Neg;
+use std::convert;
 
 /// Generic type that lists functions and constants needed in calculations.
 /// Default implementations for f32 and f64 are provided.
 pub trait FloatType:Sized
   +Copy
+  +From<i16>
   +PartialEq
   +PartialOrd
   +Neg<Output=Self>

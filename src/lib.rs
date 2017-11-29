@@ -88,3 +88,4 @@ pub use self::numerical::newton_raphson::find_root_newton_raphson;
 pub use self::numerical::brent::find_root_brent;
 pub use self::numerical::secant::find_root_secant;
 pub use self::numerical::regula_falsi::find_root_regula_falsi;
+pub use self::numerical::polynom::find_roots_sturm;
