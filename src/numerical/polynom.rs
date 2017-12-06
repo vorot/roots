@@ -29,6 +29,7 @@ use super::super::find_roots_linear;
 use super::super::find_roots_quadratic;
 use super::super::find_roots_cubic;
 use super::super::find_roots_quartic;
+use super::super::find_root_newton_raphson;
 use std::fmt::Debug;
 
 trait Polynom<F> {
@@ -37,7 +38,7 @@ trait Polynom<F> {
 }
 
 impl<'a, F> Polynom<F> for &'a [F]
-    where F: FloatType + Debug
+    where F: FloatType
 {
     fn value(self, x: F) -> F {
         let mut result = F::zero();
@@ -60,13 +61,20 @@ impl<'a, F> Polynom<F> for &'a [F]
         let mut ni = F::one();
 
         for x in result.iter_mut().rev() {
-            println!("{:?} {:?}", ni, *x);
             *x = (*x * ni) / n;
             ni = ni + F::one();
         }
 
         result
     }
+}
+
+enum RootInterval<F>
+    where F: FloatType
+{
+    First { x: F, y: F },
+    Middle { x1: F, y1: F, x2: F, y2: F },
+    Last { x: F, y: F },
 }
 
 /// Find all roots of the normalized polynom
@@ -96,7 +104,92 @@ pub fn find_roots_sturm<F>(a: &[F], convergency: &mut Convergency<F>) -> Result<
         2 => Ok(find_roots_quadratic(F::one(), a[0], a[1]).as_ref().to_vec()),
         3 => Ok(find_roots_cubic(F::one(), a[0], a[1], a[2]).as_ref().to_vec()),
         4 => Ok(find_roots_quartic(F::one(), a[0], a[1], a[2], a[3]).as_ref().to_vec()),
-        _ => Err(SearchError::NoConvergency),
+        _ => {
+            let derivative = a.derivative_polynom();
+            match find_roots_sturm(&derivative, convergency) {
+                Ok(derivative_roots) => {
+                    let mut result = Vec::new();
+                    let mut intervals = Vec::new();
+                    let mut negative = a.len() % 2 == 0; // Odd polynoms start negative
+                    let mut last_x = F::zero();
+                    let mut last_y = F::zero();
+                    for derivative_root in derivative_roots.iter() {
+                        let extremum = a.value(*derivative_root);
+                        if (extremum > F::zero()) == negative {
+                            let interval = if intervals.len() == 0 {
+                                RootInterval::First {
+                                    x: *derivative_root,
+                                    y: extremum,
+                                }
+                            } else {
+                                RootInterval::Middle {
+                                    x1: last_x,
+                                    y1: last_y,
+                                    x2: *derivative_root,
+                                    y2: extremum,
+                                }
+                            };
+                            intervals.push(interval);
+                            last_x = *derivative_root;
+                            last_y = extremum;
+                            negative = !negative;
+                        }
+                    }
+                    if intervals.len() > 0 && last_y < F::zero() {
+                        intervals.push(RootInterval::Last {
+                            x: last_x,
+                            y: last_y,
+                        });
+                    }
+
+                    for interval in intervals.iter() {
+                        match interval {
+                            &RootInterval::First { x, y } => {
+                                match find_root_newton_raphson(x - y.abs(),
+                                                               |xx| a.value(xx),
+                                                               |xx| derivative.value(xx),
+                                                               convergency) {
+                                    Ok(xxx) => {
+                                        if xxx <= x {
+                                            result.push(xxx)
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            &RootInterval::Middle { x1, y1, x2, y2 } => {
+                                match find_root_newton_raphson(x2 - x2 * (y2 - y1) / (x2 - x1),
+                                                               |xx| a.value(xx),
+                                                               |xx| derivative.value(xx),
+                                                               convergency) {
+                                    Ok(xxx) => {
+                                        if (xxx >= x1) && (xxx <= x2) {
+                                            result.push(xxx)
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            &RootInterval::Last { x, y } => {
+                                match find_root_newton_raphson(x + y.abs(),
+                                                               |xx| a.value(xx),
+                                                               |xx| derivative.value(xx),
+                                                               convergency) {
+                                    Ok(xxx) => {
+                                        if xxx >= x {
+                                            result.push(xxx)
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+                    }
+                    Ok(result)
+                }
+                Err(err) => Err(err),
+            }
+        }
     }
 
 }
