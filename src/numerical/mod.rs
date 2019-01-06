@@ -23,7 +23,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use super::FloatType;
-
+use std::error::Error;
+use std::fmt;
 /// Possible errors
 #[derive(Debug,PartialEq)]
 pub enum SearchError {
@@ -33,6 +34,25 @@ pub enum SearchError {
     NoBracketing,
     /// The algorithm cannot continue from the point where the derivative is zero
     ZeroDerivative,
+}
+
+impl fmt::Display for SearchError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self{
+            SearchError::NoConvergency=>write!(f, "Convergency Error"),
+            SearchError::NoBracketing=>write!(f, "Bracketing Error"),
+            SearchError::ZeroDerivative=>write!(f, "Zero Derivative Error"),
+        }
+    }
+}
+impl Error for SearchError {
+    fn description(&self) -> &str {
+        match self{
+            SearchError::NoConvergency=>"The algorithm could not converge within the given number of iterations",
+            SearchError::NoBracketing=>"Initial values do not bracket zero",
+            SearchError::ZeroDerivative=>"The algorithm cannot continue from the point where the derivative is zero",
+        }
+    }
 }
 
 /// The way to check if the algorithm has finished by either finding a root

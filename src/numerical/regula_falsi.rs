@@ -152,6 +152,8 @@ mod test {
         conv.reset();
         assert_eq!(find_root_regula_falsi(10f64, 20f64, &f, &mut conv),
                    Err(SearchError::NoBracketing));
+        let result=find_root_regula_falsi(10f64, 20f64, &f, &mut conv);
+        assert_eq!(result.unwrap_err().description(), "Initial values do not bracket zero");
         assert_eq!(0, conv.get_iter_count());
     }
 }
