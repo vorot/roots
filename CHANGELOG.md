@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-* Trait Error implmented for SearchError - thanks to phillyfan1138
+* Trait Error implemented for SearchError - thanks to phillyfan1138
 
 ## [0.0.4] - 2017-09-05
 * Reduced the performance overhead by using generics - thanks to aepsil0n
