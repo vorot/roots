@@ -12,27 +12,27 @@ manual code conversion nightmare and mention me in the source code.
 
 Stepan Yakovenko,
 https://github.com/stiv-yakovenko
-
 */
+
+/* Added to roots 0.0.5 by Mikhail Vorotilov on request of Stepan Yakovenko */
+
+use std::cmp;
+use std::collections::VecDeque;
 use std::fmt;
 use std::ops::Index;
-use std::collections::VecDeque;
 use std::ops::IndexMut;
-use std::cmp;
-extern crate num_traits;
 
-use eigen::num_traits::Float;
-//use self::num_traits;
+use super::FloatType;
 
 pub struct Matrix {
-    data:VecDeque<f64>,
-    n:usize
+    data: VecDeque<f64>,
+    n: usize,
 }
 impl Matrix {
-    pub fn new(n:usize)->Matrix{
+    pub fn new(n: usize) -> Matrix {
         let mut data = VecDeque::new();
         data.resize(n * n, 0.);
-        Matrix{data:data,n:n}
+        Matrix { data: data, n: n }
     }
 }
 impl fmt::Debug for Matrix {
@@ -40,25 +40,25 @@ impl fmt::Debug for Matrix {
         write!(f, "{{").ok();
         for r in 0..self.n {
             for c in 0..self.n {
-                write!(f, "{:.3?} ", self[[c,r]]).ok();
+                write!(f, "{:.3?} ", self[[c, r]]).ok();
             }
             writeln!(f, "").ok();
         }
         write!(f, "}}")
     }
 }
-impl Index<[usize; 2]> for Matrix{
+impl Index<[usize; 2]> for Matrix {
     type Output = f64;
     fn index(&self, idx: [usize; 2]) -> &f64 {
-        &self.data[idx[0]+self.n*idx[1]]
+        &self.data[idx[0] + self.n * idx[1]]
     }
 }
-impl IndexMut<[usize; 2]> for Matrix{
+impl IndexMut<[usize; 2]> for Matrix {
     fn index_mut(&mut self, idx: [usize; 2]) -> &mut f64 {
-        self.data.get_mut(idx[0]+self.n*idx[1]).unwrap()
+        self.data.get_mut(idx[0] + self.n * idx[1]).unwrap()
     }
 }
-#[allow(dead_code)]
+
 fn cdiv(xr: f64, xi: f64, yr: f64, yi: f64) -> (f64, f64) {
     let r: f64;
     let d: f64;
@@ -70,10 +70,9 @@ fn cdiv(xr: f64, xi: f64, yr: f64, yi: f64) -> (f64, f64) {
         r = yr / yi;
         d = yi + r * yr;
         ((r * xr + xi) / d, (r * xi - xr) / d)
-    }    
+    }
 }
 
-#[allow(dead_code)]
 pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &mut Vec<f64>) {
     //  This is derived from the Algol procedure hqr2,
     //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -133,7 +132,7 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
             e[n as usize] = 0.0;
             n = n - 1;
             iter = 0;
-            // Two roots found
+        // Two roots found
         } else if l == n - 1 {
             w = h[[n as usize, n as usize - 1]] * h[[n as usize - 1, n as usize]];
             p = (h[[n as usize - 1, n as usize - 1]] - h[[n as usize, n as usize]]) / 2.0;
@@ -187,7 +186,7 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                     v[[i as usize, n as usize]] = q * v[[i as usize, n as usize]] - p * z;
                     i = i + 1;
                 }
-                // Complex pair
+            // Complex pair
             } else {
                 d[n as usize - 1] = x + p;
                 d[n as usize] = x + p;
@@ -196,7 +195,7 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
             }
             n = n - 2;
             iter = 0;
-            // No convergence yet
+        // No convergence yet
         } else {
             // Form shift
             x = h[[n as usize, n as usize]];
@@ -240,8 +239,8 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                     w = y;
                 }
             }
-            iter = iter + 1;   // (Could check iteration count here.)
-            // Look for two consecutive small sub-diagonal elements
+            iter = iter + 1; // (Could check iteration count here.)
+                             // Look for two consecutive small sub-diagonal elements
             let mut m = n - 2;
             while m >= l {
                 z = h[[m as usize, m as usize]];
@@ -257,10 +256,13 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                 if m == l {
                     break;
                 }
-                if h[[m as usize, m as usize - 1]].abs() * (q).abs() + (r).abs() <
-                    eps * ((p).abs() * ((h[[m as usize - 1, m as usize - 1]]).abs() + (z).abs() +
-                        (h[[m as usize + 1, m as usize + 1]]).abs()
-                    )) {
+                if h[[m as usize, m as usize - 1]].abs() * (q).abs() + (r).abs()
+                    < eps
+                        * ((p).abs()
+                            * ((h[[m as usize - 1, m as usize - 1]]).abs()
+                                + (z).abs()
+                                + (h[[m as usize + 1, m as usize + 1]]).abs()))
+                {
                     break;
                 }
                 m = m - 1;
@@ -283,7 +285,7 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                     r = if notlast { h[[k as usize + 2, k as usize - 1]] } else { 0.0 };
                     x = (p).abs() + (q).abs() + (r).abs();
                     if x == 0.0 {
-                        k=k+1;
+                        k = k + 1;
                         continue;
                     }
                     p = p / x;
@@ -342,12 +344,12 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                         v[[i, k as usize + 1]] = v[[i, k as usize + 1]] - p * q;
                         i = i + 1;
                     }
-                }  // (s != 0)
+                } // (s != 0)
                 k = k + 1;
-            }  // k loop
-        }  // check convergence
-    }  // while n >= low
-    // Backsubstitute to find vectors of upper triangular form
+            } // k loop
+        } // check convergence
+    } // while n >= low
+      // Backsubstitute to find vectors of upper triangular form
     if norm == 0.0 {
         return;
     }
@@ -379,7 +381,7 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                         } else {
                             h[[i as usize, n as usize]] = -r / (eps * norm);
                         }
-                        // Solve real equations
+                    // Solve real equations
                     } else {
                         x = h[[i as usize, i as usize + 1]];
                         y = h[[i as usize + 1, i as usize]];
@@ -404,7 +406,7 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                 }
                 i = i - 1;
             }
-            // Complex vector
+        // Complex vector
         } else if q < 0. {
             let mut l = n - 1;
             // Last vector component imaginary so matrix is triangular
@@ -412,7 +414,12 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                 h[[n as usize - 1, n as usize - 1]] = q / h[[n as usize, n as usize - 1]];
                 h[[n as usize - 1, n as usize]] = -(h[[n as usize, n as usize]] - p) / h[[n as usize, n as usize - 1]];
             } else {
-                let (cdivr, cdivi) = cdiv(0.0, -h[[n as usize - 1, n as usize]], h[[n as usize - 1, n as usize - 1]] - p, q);
+                let (cdivr, cdivi) = cdiv(
+                    0.0,
+                    -h[[n as usize - 1, n as usize]],
+                    h[[n as usize - 1, n as usize - 1]] - p,
+                    q,
+                );
                 h[[n as usize - 1, n as usize - 1]] = cdivr;
                 h[[n as usize - 1, n as usize]] = cdivi;
             }
@@ -448,17 +455,23 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                         vr = (d[i as usize] - p) * (d[i as usize] - p) + e[i as usize] * e[i as usize] - q * q;
                         vi = (d[i as usize] - p) * 2.0 * q;
                         if vr == 0.0 && vi == 0.0 {
-                            vr = eps * norm * ((w).abs() + (q).abs() +
-                                (x).abs() + (y).abs() + (z)).abs();
+                            vr = eps * norm * ((w).abs() + (q).abs() + (x).abs() + (y).abs() + (z)).abs();
                         }
                         let (cdivr, cdivi) = cdiv(x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi);
                         h[[i as usize, n as usize - 1]] = cdivr;
                         h[[i as usize, n as usize]] = cdivi;
                         if (x).abs() > ((z).abs() + (q).abs()) {
-                            h[[i as usize + 1, n as usize - 1]] = (-ra - w * h[[i as usize, n as usize - 1]] + q * h[[i as usize, n as usize]]) / x;
-                            h[[i as usize + 1, n as usize]] = (-sa - w * h[[i as usize, n as usize]] - q * h[[i as usize, n as usize - 1]]) / x;
+                            h[[i as usize + 1, n as usize - 1]] =
+                                (-ra - w * h[[i as usize, n as usize - 1]] + q * h[[i as usize, n as usize]]) / x;
+                            h[[i as usize + 1, n as usize]] =
+                                (-sa - w * h[[i as usize, n as usize]] - q * h[[i as usize, n as usize - 1]]) / x;
                         } else {
-                            let (cdivr, cdivi) = cdiv(-r - y * h[[i as usize, n as usize - 1]], -s - y * h[[i as usize, n as usize]], z, q);
+                            let (cdivr, cdivi) = cdiv(
+                                -r - y * h[[i as usize, n as usize - 1]],
+                                -s - y * h[[i as usize, n as usize]],
+                                z,
+                                q,
+                            );
                             h[[i as usize + 1, n as usize - 1]] = cdivr;
                             h[[i as usize + 1, n as usize]] = cdivi;
                         }
@@ -519,8 +532,8 @@ pub fn orthes(m: &mut Matrix, h_mat: &mut Matrix, v_mat: &mut Matrix) {
     let n = m.n;
     let high = n - 1;
     let mut m = low + 1;
-    let mut ort = vec!(0.; n);
-       while m < high - 1 {
+    let mut ort = vec![0.; n];
+    while m < high - 1 {
         // Scale column.
         let mut scale = 0.0;
         let mut i = m;
@@ -556,8 +569,7 @@ pub fn orthes(m: &mut Matrix, h_mat: &mut Matrix, v_mat: &mut Matrix) {
                 }
                 f = f / h;
                 let mut i = m;
-                while
-                    i <= high {
+                while i <= high {
                     h_mat[[i, j]] -= f * ort[i];
                     i = i + 1;
                 }
@@ -620,14 +632,12 @@ pub fn orthes(m: &mut Matrix, h_mat: &mut Matrix, v_mat: &mut Matrix) {
     }
 }
 
-#[allow(dead_code)]
-fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)>{
+fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)> {
     let n = m.n;
     let mut h_mat = Matrix::new(n);
     let mut v_mat = Matrix::new(n);
-    //let mut ort = vec!(0.;n);
-    let mut d = vec!(0.; n);
-    let mut e = vec!(0.; n);
+    let mut d = vec![0.; n];
+    let mut e = vec![0.; n];
     for i in 0..n {
         for j in 0..n {
             h_mat[[i, j]] = m[[i, j]];
@@ -635,40 +645,30 @@ fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)>{
     }
     orthes(m, &mut h_mat, &mut v_mat);
     hqr2(n, &mut h_mat, &mut v_mat, &mut d, &mut e);
-    let mut r= vec!((0.,0.); n);
+    let mut r = vec![(0., 0.); n];
     for i in 0..n {
-        r[i]=(d[i],e[i])
+        r[i] = (d[i], e[i])
     }
     r
 }
 
-#[allow(dead_code)]
-// 6 x x x  + 9 x x + 3  x + 1 == 0 is vec![1.,3.,9.,6.] 
+/// Find all roots of the polynomial by finding eigen numbers of the corresponding matrix.
+/// (Converted from Java by stivstivsti)
 pub fn solve_poly(c: Vec<f64>) -> VecDeque<f64> {
     let n = c.len();
     let mut m = Matrix::new(n);
-    for i in 0..(n-1) {
-        m[[i+1,i]]=1.;
+    for i in 0..(n - 1) {
+        m[[i + 1, i]] = 1.;
     }
     for i in 0..(n) {
-        m[[i,n-1]]=-c[i];
+        m[[i, n - 1]] = -c[i];
     }
-    //println!("{:?}",m);
     let ei = calc_eigen(&mut m);
     let mut r = VecDeque::new();
     for c in ei {
-        if c.1*c.1==0. {
+        if c.1 * c.1 == 0. {
             r.push_back(c.0);
         }
     }
     r
 }
-
-/*fn main() {
-    let c =vec![1.,3.,9.,6.];
-    let r =solve_poly(c);
-    println!("{:?}",r);
-    //    let m = Matrix::new(10);
-    //    *m.get(5, 5) = 7.;
-}
-*/

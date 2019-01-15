@@ -147,6 +147,7 @@ impl<F: FloatType> Convergency<F> for F {
 }
 
 pub mod brent;
+pub mod eigen;
 pub mod newton_raphson;
 pub mod polynom;
 pub mod regula_falsi;
