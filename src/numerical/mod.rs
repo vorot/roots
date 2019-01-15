@@ -69,9 +69,21 @@ where
     fn is_converged(&self, convergency: &mut Convergency<F>) -> bool {
         convergency.is_converged(self.begin.x, self.end.x)
     }
+    /// Returns a point somewhere in middle of the interval for narrowing this interval down.
+    /// Rules are as follows:
+    /// * If the interval is bracketed, use the secant to find the middle point.
+    /// ** The middle point may not be too close to either range of the interval.
+    /// * If the interval is not bracketed (why would one use an unbracketed interval?), bisect it.
     fn middle(&self) -> F {
         if self.is_bracketed() && self.begin.y != self.end.y {
-            self.begin.x - self.begin.y * (self.end.x - self.begin.x) / (self.end.y - self.begin.y)
+            let mut shift = -self.begin.y * (self.end.x - self.begin.x) / (self.end.y - self.begin.y);
+            if shift < (self.end.x - self.begin.x) / F::twenty_seven() {
+                shift = (self.end.x - self.begin.x) / F::twenty_seven();
+            }
+            if shift > (self.end.x - self.begin.x) * (F::twenty_seven() - F::one()) / F::twenty_seven() {
+                shift = (self.end.x - self.begin.x) * (F::twenty_seven() - F::one()) / F::twenty_seven();
+            }
+            self.begin.x + shift
         } else {
             (self.begin.x + self.end.x) / F::two()
         }
