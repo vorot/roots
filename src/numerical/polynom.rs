@@ -393,14 +393,10 @@ where
     }
 }
 
-/// Find all roots of the normalized polynom
-/// 1*x^n + a[n-1]*x^(n-1) + a[n-2]*x^(n-2) + ... + a[0] = 0.
+/// Find all roots of the normalized polynomial
+/// x^n + a[0]*x^(n-1) + a[1]*x^(n-2) + ... + a[n-1] = 0
+/// using the Sturm's theorem recursively.
 ///
-/// # Failures
-/// ## ZeroDerivative
-/// Two consecutive points have the same value. Algorithm cannot continue.
-/// ## NoConvergency
-/// Algorithm cannot find a root within the given number of iterations.
 /// # Examples
 ///
 /// ```
@@ -408,8 +404,17 @@ where
 ///
 /// let polynom = &[1f64,1f64,1f64,1f64,1f64,1f64];
 ///
-/// let roots = find_roots_sturm(polynom, &mut 1e-6);
-/// // Returns vector of roots;
+/// let roots_or_errors = find_roots_sturm(polynom, &mut 1e-6);
+/// // Returns vector of roots or search errors;
+///
+/// let roots: Vec<_> = find_roots_sturm(polynom, &mut 1e-8f64)
+///             .iter()
+///             .filter_map(|s| match s {
+///                 &Ok(ref x) => Some(*x),
+///                 &Err(_) => None,
+///             })
+///             .collect();
+/// // Returns vector of roots filterin out all search errors;
 /// ```
 pub fn find_roots_sturm<F>(a: &[F], convergency: &mut Convergency<F>) -> Vec<Result<F, SearchError>>
 where
@@ -513,5 +518,19 @@ mod test {
         let polynom = [-2f64, -3f64, 4f64, 0f64, 0f64];
         let derivative = polynom.derivative_polynom();
         assert_float_array_eq!(1e-15, derivative, [-8f64 / 5f64, -9f64 / 5f64, 8f64 / 5f64, 0f64]);
+    }
+
+    #[test]
+    fn find_roots_sturm_7() {
+        // x^7+4.0*x^6-4.0*x^4+2.0*x^3+1.0*x^2+6.0*x^1-3.0*x^0 => {-3.6547, -1.67175, 0.455904}
+        let polynom = [4f64, 0f64, -4f64, 2f64, 1f64, 6f64, -3f64];
+        let roots: Vec<_> = find_roots_sturm(&polynom, &mut 1e-8f64)
+            .iter()
+            .filter_map(|s| match s {
+                &Ok(ref x) => Some(*x),
+                &Err(_) => None,
+            })
+            .collect();
+        assert_float_array_eq!(1e-5, roots, [-3.6547f64, -1.67175f64, 0.455904f64]);
     }
 }
