@@ -1,7 +1,7 @@
 [package]
 
 name = "roots"
-version = "0.0.4"
+version = "0.0.5"
 authors = ["Mikhail Vorotilov <mikhail.vorotilov@gmail.com>"]
 license = "BSD-2-Clause"
 repository = "https://github.com/vorot/roots"
@@ -20,7 +20,7 @@ name = "roots"
 path = "src/lib.rs"
 
 [dev-dependencies]
-bencher = "0.1.2"
+bencher = "0.1.5"
 
 [[bench]]
 name="benches"
