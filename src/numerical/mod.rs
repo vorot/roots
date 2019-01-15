@@ -142,6 +142,7 @@ pub mod secant;
 
 pub mod debug_convergency;
 pub mod simple_convergency;
+
 #[cfg(test)]
 mod test {
     use super::*;

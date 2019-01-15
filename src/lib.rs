@@ -38,6 +38,7 @@
 //! by implementing the Convergency trait.
 //! Functions find_roots_* return all roots of several simple equations at once.
 
+#[cfg(test)]
 macro_rules! assert_float_eq(
     ($precision:expr, $given:expr , $expected:expr) => ({
       match (&($precision), &($given), &($expected)) {
@@ -51,6 +52,7 @@ macro_rules! assert_float_eq(
     })
 );
 
+#[cfg(test)]
 macro_rules! assert_float_array_eq(
     ($precision:expr, $given:expr , $expected:expr) => ({
       match (&($precision), &($given), &($expected)) {

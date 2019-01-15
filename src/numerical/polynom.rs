@@ -31,7 +31,6 @@ use super::Convergency;
 use super::Interval;
 use super::Sample;
 use super::SearchError;
-use std::fmt::Debug;
 
 #[derive(Debug, PartialEq)]
 struct ValueAndDerivative<F>
