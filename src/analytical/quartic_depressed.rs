@@ -47,15 +47,16 @@ pub fn find_roots_quartic_depressed<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<
         super::biquadratic::find_roots_biquadratic(F::one(), a2, a0)
     } else if a0 == F::zero() {
         // a0 = 0; x^4 + a2*x^2 + a1*x = 0; reduce to normalized cubic and add zero root
-        super::cubic_normalized::find_roots_cubic_normalized(F::zero(), a2, a1)
-            .add_new_root(F::zero())
+        super::cubic_normalized::find_roots_cubic_normalized(F::zero(), a2, a1).add_new_root(F::zero())
     } else {
         // Solve the auxiliary equation y^3 + (5/2)*a2*y^2 + (2*a2^2-a0)*y + (a2^3/2 - a2*a0/2 - a1^2/8) = 0
         let a2_pow_2 = a2 * a2;
         let a1_div_2 = a1 / F::two();
-        let (b2, b1, b0) = (a2 * F::five() / F::two(),
-                            F::two() * a2_pow_2 - a0,
-                            (a2_pow_2 * a2 - a2 * a0 - a1_div_2 * a1_div_2) / F::two());
+        let (b2, b1, b0) = (
+            a2 * F::five() / F::two(),
+            F::two() * a2_pow_2 - a0,
+            (a2_pow_2 * a2 - a2 * a0 - a1_div_2 * a1_div_2) / F::two(),
+        );
 
         // At least one root always exists. The last root is the maximal one.
         let y = *super::cubic_normalized::find_roots_cubic_normalized(b2, b1, b0)
@@ -73,7 +74,8 @@ pub fn find_roots_quartic_depressed<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<
             let mut roots = super::quadratic::find_roots_quadratic(F::one(), sqrt_a2_plus_2y, q0a);
             for x in super::quadratic::find_roots_quadratic(F::one(), -sqrt_a2_plus_2y, q0b)
                 .as_ref()
-                .iter() {
+                .iter()
+            {
                 roots = roots.add_new_root(*x);
             }
             roots
@@ -89,10 +91,8 @@ mod test {
 
     #[test]
     fn test_find_roots_quartic_depressed() {
-        assert_eq!(find_roots_quartic_depressed(0f32, 0f32, 0f32),
-                   Roots::One([0f32]));
-        assert_eq!(find_roots_quartic_depressed(1f32, 1f32, 1f32),
-                   Roots::No([]));
+        assert_eq!(find_roots_quartic_depressed(0f32, 0f32, 0f32), Roots::One([0f32]));
+        assert_eq!(find_roots_quartic_depressed(1f32, 1f32, 1f32), Roots::No([]));
 
         // Thanks WolframAlpha for the test data
         match find_roots_quartic_depressed(1f64, 1f64, -1f64) {
@@ -106,12 +106,16 @@ mod test {
 
         match find_roots_quartic_depressed(-10f64, 5f64, 1f64) {
             Roots::Four(x) => {
-                assert_float_array_eq!(1e-15,
-                                       x,
-                                       [-3.3754294311910698f64,
-                                        -0.1531811728532153f64,
-                                        0.67861075799846644f64,
-                                        2.84999984604581877f64]);
+                assert_float_array_eq!(
+                    1e-15,
+                    x,
+                    [
+                        -3.3754294311910698f64,
+                        -0.1531811728532153f64,
+                        0.67861075799846644f64,
+                        2.84999984604581877f64
+                    ]
+                );
             }
             _ => {
                 assert!(false);

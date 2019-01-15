@@ -65,27 +65,26 @@ macro_rules! assert_float_array_eq(
 );
 
 mod analytical;
-mod numerical;
 mod float;
+mod numerical;
 
 pub use self::float::FloatType;
 
-pub use self::analytical::roots::Roots;
-pub use self::analytical::linear::find_roots_linear;
-pub use self::analytical::quadratic::find_roots_quadratic;
+pub use self::analytical::biquadratic::find_roots_biquadratic;
 pub use self::analytical::cubic::find_roots_cubic;
 pub use self::analytical::cubic_depressed::find_roots_cubic_depressed;
 pub use self::analytical::cubic_normalized::find_roots_cubic_normalized;
-pub use self::analytical::biquadratic::find_roots_biquadratic;
-pub use self::analytical::quartic_depressed::find_roots_quartic_depressed;
+pub use self::analytical::linear::find_roots_linear;
+pub use self::analytical::quadratic::find_roots_quadratic;
 pub use self::analytical::quartic::find_roots_quartic;
+pub use self::analytical::quartic_depressed::find_roots_quartic_depressed;
+pub use self::analytical::roots::Roots;
 
-
-pub use self::numerical::Convergency;
-pub use self::numerical::simple_convergency::SimpleConvergency;
+pub use self::numerical::brent::find_root_brent;
 pub use self::numerical::debug_convergency::DebugConvergency;
 pub use self::numerical::newton_raphson::find_root_newton_raphson;
-pub use self::numerical::brent::find_root_brent;
-pub use self::numerical::secant::find_root_secant;
-pub use self::numerical::regula_falsi::find_root_regula_falsi;
 pub use self::numerical::polynom::find_roots_sturm;
+pub use self::numerical::regula_falsi::find_root_regula_falsi;
+pub use self::numerical::secant::find_root_secant;
+pub use self::numerical::simple_convergency::SimpleConvergency;
+pub use self::numerical::Convergency;

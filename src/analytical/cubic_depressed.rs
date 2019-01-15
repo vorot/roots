@@ -77,8 +77,7 @@ mod test {
     #[test]
     fn test_find_roots_cubic_depressed() {
         assert_eq!(find_roots_cubic_depressed(0f32, 0f32), Roots::One([0f32]));
-        assert_eq!(find_roots_cubic_depressed(-1f64, 0f64),
-                   Roots::Three([-1f64, 0f64, 1f64]));
+        assert_eq!(find_roots_cubic_depressed(-1f64, 0f64), Roots::Three([-1f64, 0f64, 1f64]));
 
         match find_roots_cubic_depressed(-2f64, 2f64) {
             Roots::One(x) => {
@@ -100,11 +99,7 @@ mod test {
 
         match find_roots_cubic_depressed(-2f64, 1f64) {
             Roots::Three(x) => {
-                assert_float_array_eq!(1e-15,
-                                       x,
-                                       [(-1f64 - 5f64.sqrt()) / 2f64,
-                                        (-1f64 + 5f64.sqrt()) / 2f64,
-                                        1f64]);
+                assert_float_array_eq!(1e-15, x, [(-1f64 - 5f64.sqrt()) / 2f64, (-1f64 + 5f64.sqrt()) / 2f64, 1f64]);
             }
             _ => {
                 assert!(false);

@@ -23,8 +23,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use super::super::FloatType;
-use super::SearchError;
 use super::Convergency;
+use super::SearchError;
 
 /// Find a root of the function f(x) = 0 using the Newton-Raphson method.
 ///
@@ -61,14 +61,16 @@ use super::Convergency;
 /// let root2 = find_root_newton_raphson(-10f64, &f, &d, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_newton_raphson<F, Func, Deriv>(start: F,
-                                                f: Func,
-                                                d: Deriv,
-                                                convergency: &mut Convergency<F>)
-                                                -> Result<F, SearchError>
-    where F: FloatType,
-          Func: Fn(F) -> F,
-          Deriv: Fn(F) -> F
+pub fn find_root_newton_raphson<F, Func, Deriv>(
+    start: F,
+    f: Func,
+    d: Deriv,
+    convergency: &mut Convergency<F>,
+) -> Result<F, SearchError>
+where
+    F: FloatType,
+    Func: Fn(F) -> F,
+    Deriv: Fn(F) -> F,
 {
     let mut x = start;
 
@@ -106,8 +108,8 @@ pub fn find_root_newton_raphson<F, Func, Deriv>(start: F,
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::super::*;
+    use super::*;
 
     #[test]
     fn test_find_root_newton_raphson() {
@@ -116,15 +118,19 @@ mod test {
         let mut conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_newton_raphson(10f64, &f, &d, &mut conv).ok().unwrap(),
-                         1f64);
+        assert_float_eq!(
+            1e-15f64,
+            find_root_newton_raphson(10f64, &f, &d, &mut conv).ok().unwrap(),
+            1f64
+        );
         assert_eq!(8, conv.get_iter_count());
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_newton_raphson(-10f64, &f, &d, &mut conv).ok().unwrap(),
-                         -1f64);
+        assert_float_eq!(
+            1e-15f64,
+            find_root_newton_raphson(-10f64, &f, &d, &mut conv).ok().unwrap(),
+            -1f64
+        );
         assert_eq!(8, conv.get_iter_count());
     }
 }

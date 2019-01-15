@@ -23,8 +23,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use super::super::FloatType;
-use super::SearchError;
 use super::Convergency;
+use super::SearchError;
 
 /// Find a root of the function f(x) = 0 using the secant method.
 ///
@@ -60,13 +60,10 @@ use super::Convergency;
 /// let root2 = find_root_secant(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_secant<F, Func>(first: F,
-                                 second: F,
-                                 f: Func,
-                                 convergency: &mut Convergency<F>)
-                                 -> (Result<F, SearchError>)
-    where F: FloatType,
-          Func: Fn(F) -> F
+pub fn find_root_secant<F, Func>(first: F, second: F, f: Func, convergency: &mut Convergency<F>) -> (Result<F, SearchError>)
+where
+    F: FloatType,
+    Func: Fn(F) -> F,
 {
     let mut x1 = first;
     let mut y1 = f(x1);
@@ -107,8 +104,8 @@ pub fn find_root_secant<F, Func>(first: F,
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::super::*;
+    use super::*;
 
     #[test]
     fn test_find_root_secant() {
@@ -116,20 +113,18 @@ mod test {
         let mut conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_secant(10f64, 0f64, &f, &mut conv).ok().unwrap(),
-                         1f64);
+        assert_float_eq!(1e-15f64, find_root_secant(10f64, 0f64, &f, &mut conv).ok().unwrap(), 1f64);
         assert_eq!(12, conv.get_iter_count());
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_secant(-10f64, 0f64, &f, &mut conv).ok().unwrap(),
-                         -1f64);
+        assert_float_eq!(1e-15f64, find_root_secant(-10f64, 0f64, &f, &mut conv).ok().unwrap(), -1f64);
         assert_eq!(12, conv.get_iter_count());
 
         conv.reset();
-        assert_eq!(find_root_secant(10f64, -10f64, &f, &mut conv),
-                   Err(SearchError::ZeroDerivative));
+        assert_eq!(
+            find_root_secant(10f64, -10f64, &f, &mut conv),
+            Err(SearchError::ZeroDerivative)
+        );
         assert_eq!(0, conv.get_iter_count());
     }
 }

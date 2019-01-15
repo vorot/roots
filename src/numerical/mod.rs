@@ -25,8 +25,61 @@
 use super::FloatType;
 use std::error::Error;
 use std::fmt;
+
+/// Pair of the independent variable x and the function value y=F(x)
+#[derive(Debug, PartialEq)]
+pub struct Sample<F>
+where
+    F: FloatType,
+{
+    /// Value of the independent variable (X-axis)
+    x: F,
+    /// Value of the dependent variable (Y-axis)
+    y: F,
+}
+
+impl<F> Sample<F>
+where
+    F: FloatType,
+{
+    fn is_bracketed_with(&self, other: &Self) -> bool {
+        self.y * other.y <= F::zero()
+    }
+}
+
+/// Interval between two samples, including these samples
+#[derive(Debug, PartialEq)]
+pub struct Interval<F>
+where
+    F: FloatType,
+{
+    /// First sample
+    begin: Sample<F>,
+    /// Last sample
+    end: Sample<F>,
+}
+
+impl<F> Interval<F>
+where
+    F: FloatType,
+{
+    fn is_bracketed(&self) -> bool {
+        self.begin.is_bracketed_with(&self.end)
+    }
+    fn is_converged(&self, convergency: &mut Convergency<F>) -> bool {
+        convergency.is_converged(self.begin.x, self.end.x)
+    }
+    fn middle(&self) -> F {
+        if self.is_bracketed() && self.begin.y != self.end.y {
+            self.begin.x - self.begin.y * (self.end.x - self.begin.x) / (self.end.y - self.begin.y)
+        } else {
+            (self.begin.x + self.end.x) / F::two()
+        }
+    }
+}
+
 /// Possible errors
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum SearchError {
     /// The algorithm could not converge within the given number of iterations
     NoConvergency,
@@ -38,19 +91,19 @@ pub enum SearchError {
 
 impl fmt::Display for SearchError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self{
-            SearchError::NoConvergency=>write!(f, "Convergency Error"),
-            SearchError::NoBracketing=>write!(f, "Bracketing Error"),
-            SearchError::ZeroDerivative=>write!(f, "Zero Derivative Error"),
+        match self {
+            SearchError::NoConvergency => write!(f, "Convergency Error"),
+            SearchError::NoBracketing => write!(f, "Bracketing Error"),
+            SearchError::ZeroDerivative => write!(f, "Zero Derivative Error"),
         }
     }
 }
 impl Error for SearchError {
     fn description(&self) -> &str {
-        match self{
-            SearchError::NoConvergency=>"The algorithm could not converge within the given number of iterations",
-            SearchError::NoBracketing=>"Initial values do not bracket zero",
-            SearchError::ZeroDerivative=>"The algorithm cannot continue from the point where the derivative is zero",
+        match self {
+            SearchError::NoConvergency => "The algorithm could not converge within the given number of iterations",
+            SearchError::NoBracketing => "Initial values do not bracket zero",
+            SearchError::ZeroDerivative => "The algorithm cannot continue from the point where the derivative is zero",
         }
     }
 }
@@ -81,11 +134,102 @@ impl<F: FloatType> Convergency<F> for F {
     }
 }
 
-pub mod newton_raphson;
 pub mod brent;
-pub mod secant;
-pub mod regula_falsi;
+pub mod newton_raphson;
 pub mod polynom;
+pub mod regula_falsi;
+pub mod secant;
 
-pub mod simple_convergency;
 pub mod debug_convergency;
+pub mod simple_convergency;
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn sample_bracketed() {
+        let sample1 = Sample { x: 0f64, y: 0f64 };
+        let sample2 = Sample { x: 1f64, y: 1f64 };
+        let sample3 = Sample { x: 1f64, y: -1f64 };
+        let sample4 = Sample { x: -1f64, y: 0f64 };
+        let sample5 = Sample { x: -1f64, y: 1f64 };
+        assert_eq!(true, sample1.is_bracketed_with(&sample2));
+        assert_eq!(true, sample1.is_bracketed_with(&sample3));
+        assert_eq!(true, sample1.is_bracketed_with(&sample4));
+        assert_eq!(true, sample1.is_bracketed_with(&sample5));
+        assert_eq!(true, sample2.is_bracketed_with(&sample3));
+        assert_eq!(true, sample2.is_bracketed_with(&sample4));
+        assert_eq!(false, sample2.is_bracketed_with(&sample5));
+        assert_eq!(true, sample3.is_bracketed_with(&sample4));
+        assert_eq!(true, sample3.is_bracketed_with(&sample5));
+        assert_eq!(true, sample4.is_bracketed_with(&sample5));
+    }
+
+    #[test]
+    fn root_interval_bracketed() {
+        let sut1 = Interval {
+            begin: Sample { x: 0f64, y: 0f64 },
+            end: Sample { x: 0f64, y: 0f64 },
+        };
+        let sut2 = Interval {
+            begin: Sample { x: 0f32, y: 0f32 },
+            end: Sample { x: 1f32, y: 0f32 },
+        };
+        let sut3 = Interval {
+            begin: Sample { x: 0f64, y: 0f64 },
+            end: Sample { x: 0f64, y: 1f64 },
+        };
+        let sut4 = Interval {
+            begin: Sample { x: -1f64, y: 0f64 },
+            end: Sample { x: 0f64, y: 0f64 },
+        };
+        let sut5 = Interval {
+            begin: Sample { x: -1f64, y: 0f64 },
+            end: Sample { x: 0f64, y: 1f64 },
+        };
+        let sut6 = Interval {
+            begin: Sample { x: -1f32, y: -1f32 },
+            end: Sample { x: 0f32, y: 1f32 },
+        };
+        let sut7 = Interval {
+            begin: Sample { x: 0f64, y: 1f64 },
+            end: Sample { x: 1f64, y: -1f64 },
+        };
+        assert_eq!(true, sut1.is_bracketed());
+        assert_eq!(true, sut2.is_bracketed());
+        assert_eq!(true, sut3.is_bracketed());
+        assert_eq!(true, sut4.is_bracketed());
+        assert_eq!(true, sut5.is_bracketed());
+        assert_eq!(true, sut6.is_bracketed());
+        assert_eq!(true, sut7.is_bracketed());
+    }
+
+    #[test]
+    fn root_interval_not_bracketed() {
+        let sut1 = Interval {
+            begin: Sample { x: 0f64, y: 1f64 },
+            end: Sample { x: 1f64, y: 1f64 },
+        };
+        let sut2 = Interval {
+            begin: Sample { x: -1f64, y: -1f64 },
+            end: Sample { x: 1f64, y: -1f64 },
+        };
+        assert_eq!(false, sut1.is_bracketed());
+        assert_eq!(false, sut2.is_bracketed());
+    }
+
+    #[test]
+    fn root_interval_middle() {
+        let sut1 = Interval {
+            begin: Sample { x: 0f64, y: 1f64 },
+            end: Sample { x: 2f64, y: -3f64 },
+        };
+        let sut2 = Interval {
+            begin: Sample { x: -1f64, y: 0f64 },
+            end: Sample { x: 1f64, y: 0f64 },
+        };
+        assert_eq!(0.5f64, sut1.middle());
+        assert_eq!(0f64, sut2.middle());
+    }
+
+}

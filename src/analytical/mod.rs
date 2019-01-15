@@ -22,12 +22,12 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-pub mod linear;
-pub mod quadratic;
+pub mod biquadratic;
 pub mod cubic;
 pub mod cubic_depressed;
 pub mod cubic_normalized;
-pub mod biquadratic;
-pub mod quartic_depressed;
+pub mod linear;
+pub mod quadratic;
 pub mod quartic;
+pub mod quartic_depressed;
 pub mod roots;

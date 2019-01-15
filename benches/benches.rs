@@ -26,12 +26,12 @@
 extern crate bencher;
 extern crate roots;
 use self::bencher::Bencher;
-use roots::find_root_secant;
 use roots::find_root_brent;
-use roots::find_root_regula_falsi;
 use roots::find_root_newton_raphson;
-use roots::find_roots_quadratic;
+use roots::find_root_regula_falsi;
+use roots::find_root_secant;
 use roots::find_roots_biquadratic;
+use roots::find_roots_quadratic;
 use roots::find_roots_quartic;
 
 fn x2_min_1(x: f64) -> f64 {
@@ -101,10 +101,9 @@ fn brent_x4_min_1_x1000(b: &mut Bencher) {
 fn newton_raphson_x2_min_1_x1000(b: &mut Bencher) {
     b.iter(|| {
         for _x in 0..1000 {
-            let _y =
-                find_root_newton_raphson(0.5f64, &x2_min_1, &x2_min_1_derivative, &mut 1e-15f64)
-                    .ok()
-                    .unwrap();
+            let _y = find_root_newton_raphson(0.5f64, &x2_min_1, &x2_min_1_derivative, &mut 1e-15f64)
+                .ok()
+                .unwrap();
         }
     });
 }
@@ -112,10 +111,9 @@ fn newton_raphson_x2_min_1_x1000(b: &mut Bencher) {
 fn newton_raphson_x4_min_1_x1000(b: &mut Bencher) {
     b.iter(|| {
         for _x in 0..1000 {
-            let _y =
-                find_root_newton_raphson(0.5f64, &x4_min_1, &x4_min_1_derivative, &mut 1e-15f64)
-                    .ok()
-                    .unwrap();
+            let _y = find_root_newton_raphson(0.5f64, &x4_min_1, &x4_min_1_derivative, &mut 1e-15f64)
+                .ok()
+                .unwrap();
         }
     });
 }
@@ -144,16 +142,18 @@ fn quartic_x4_min_1_x1000(b: &mut Bencher) {
     });
 }
 
-benchmark_group!(benches,
-                 quadratic_x2_min_1_x1000,
-                 biquadratic_x4_min_1_x1000,
-                 quartic_x4_min_1_x1000,
-                 secant_x2_min_1_x1000,
-                 secant_x4_min_1_x1000,
-                 regula_falsi_x2_min_1_x1000,
-                 regula_falsi_x4_min_1_x1000,
-                 brent_x2_min_1_x1000,
-                 brent_x4_min_1_x1000,
-                 newton_raphson_x2_min_1_x1000,
-                 newton_raphson_x4_min_1_x1000);
+benchmark_group!(
+    benches,
+    quadratic_x2_min_1_x1000,
+    biquadratic_x4_min_1_x1000,
+    quartic_x4_min_1_x1000,
+    secant_x2_min_1_x1000,
+    secant_x4_min_1_x1000,
+    regula_falsi_x2_min_1_x1000,
+    regula_falsi_x4_min_1_x1000,
+    brent_x2_min_1_x1000,
+    brent_x4_min_1_x1000,
+    newton_raphson_x2_min_1_x1000,
+    newton_raphson_x4_min_1_x1000
+);
 benchmark_main!(benches);

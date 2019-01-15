@@ -23,9 +23,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use super::super::FloatType;
+use super::Convergency;
 use std::fmt::Display;
 use std::fmt::LowerExp;
-use super::Convergency;
 
 /// Convergency provider for debugging.
 /// It will print out the error at each iteration.

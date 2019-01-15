@@ -290,8 +290,7 @@ where
                 let middle_x = if interval.begin.y == interval.end.y {
                     (interval.begin.x + interval.end.x) / F::two()
                 } else {
-                    interval.begin.x
-                        - interval.begin.y * (interval.end.x - interval.begin.x) / (interval.end.y - interval.begin.y)
+                    interval.begin.x - interval.begin.y * (interval.end.x - interval.begin.x) / (interval.end.y - interval.begin.y)
                 };
                 let mut middle_sample = Sample {
                     x: middle_x,
@@ -419,11 +418,7 @@ where
 {
     match a.len() {
         0 => Vec::new(),
-        1 => find_roots_linear(F::one(), a[0])
-            .as_ref()
-            .iter()
-            .map(|s| Ok(*s))
-            .collect(),
+        1 => find_roots_linear(F::one(), a[0]).as_ref().iter().map(|s| Ok(*s)).collect(),
         2 => find_roots_quadratic(F::one(), a[0], a[1])
             .as_ref()
             .iter()

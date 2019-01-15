@@ -42,8 +42,7 @@ use super::super::Roots;
 /// ```
 pub fn find_roots_cubic_normalized<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<F> {
     let q = (F::three() * a1 - a2 * a2) / F::nine();
-    let r = (F::nine() * a2 * a1 - F::twenty_seven() * a0 - F::two() * a2 * a2 * a2) /
-            (F::two() * F::twenty_seven());
+    let r = (F::nine() * a2 * a1 - F::twenty_seven() * a0 - F::two() * a2 * a2 * a2) / (F::two() * F::twenty_seven());
     let q3 = q * q * q;
     let d = q3 + r * r;
     let a2_div_3 = a2 / F::three();
@@ -78,8 +77,7 @@ mod test {
 
     #[test]
     fn test_find_roots_cubic_normalized() {
-        assert_eq!(find_roots_cubic_normalized(0f32, 0f32, 0f32),
-                   Roots::One([0f32]));
+        assert_eq!(find_roots_cubic_normalized(0f32, 0f32, 0f32), Roots::One([0f32]));
 
         match find_roots_cubic_normalized(0f64, -1f64, 0f64) {
             Roots::Three(x) => {
@@ -110,11 +108,15 @@ mod test {
 
         match find_roots_cubic_normalized(-2f64, -3f64, 2f64) {
             Roots::Three(x) => {
-                assert_float_array_eq!(1e-15,
-                                       x,
-                                       [-1.342923082777170208054859f64,
-                                        0.5293165801288393926136314f64,
-                                        2.813606502648330815441228f64]);
+                assert_float_array_eq!(
+                    1e-15,
+                    x,
+                    [
+                        -1.342923082777170208054859f64,
+                        0.5293165801288393926136314f64,
+                        2.813606502648330815441228f64
+                    ]
+                );
             }
             _ => {
                 assert!(false);

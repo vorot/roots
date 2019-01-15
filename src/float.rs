@@ -22,58 +22,72 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+use std::convert;
 use std::f32;
 use std::f64;
-use std::ops::Add;
-use std::ops::Sub;
-use std::ops::Mul;
-use std::ops::Div;
-use std::ops::Neg;
 use std::fmt::Debug;
-use std::convert;
+use std::ops::Add;
+use std::ops::Div;
+use std::ops::Mul;
+use std::ops::Neg;
+use std::ops::Sub;
 
 /// Generic type that lists functions and constants needed in calculations.
 /// Default implementations for f32 and f64 are provided.
-pub trait FloatType:Sized
-  +Copy
-  +Debug
-  +From<i16>
-  +PartialEq
-  +PartialOrd
-  +Neg<Output=Self>
-  +Add<Output=Self>
-  +Sub<Output=Self>
-  +Mul<Output=Self>
-  +Div<Output=Self> {
-  #[inline]
-  fn zero() -> Self;
-  #[inline]
-  fn one() -> Self;
-  #[inline]
-  fn two() -> Self;
-  #[inline]
-  fn three() -> Self;
-  #[inline]
-  fn pi() -> Self;
-  #[inline]
-  fn one_third() -> Self;
-  #[inline]
-  fn four() -> Self;
-  #[inline]
-  fn five() -> Self { Self::two() + Self::three() }
-  #[inline]
-  fn nine() -> Self { Self::three() * Self::three() }
-  #[inline]
-  fn twenty_seven() -> Self { Self::nine() * Self::three() }
-  #[inline]
-  fn two_third_pi() -> Self;
-  fn sqrt(self) -> Self;
-/// The cubic root function is pow(x, 1/3) accepting negative arguments
-  fn cbrt(self) -> Self { if self < Self::zero() { -(-self).powf(Self::one_third()) } else { self.powf(Self::one_third()) } }
-  fn acos(self) -> Self;
-  fn cos(self) -> Self;
-  fn abs(self) -> Self;
-  fn powf(self, n: Self) -> Self;
+pub trait FloatType:
+    Sized
+    + Copy
+    + Debug
+    + From<i16>
+    + PartialEq
+    + PartialOrd
+    + Neg<Output = Self>
+    + Add<Output = Self>
+    + Sub<Output = Self>
+    + Mul<Output = Self>
+    + Div<Output = Self>
+{
+    #[inline]
+    fn zero() -> Self;
+    #[inline]
+    fn one() -> Self;
+    #[inline]
+    fn two() -> Self;
+    #[inline]
+    fn three() -> Self;
+    #[inline]
+    fn pi() -> Self;
+    #[inline]
+    fn one_third() -> Self;
+    #[inline]
+    fn four() -> Self;
+    #[inline]
+    fn five() -> Self {
+        Self::two() + Self::three()
+    }
+    #[inline]
+    fn nine() -> Self {
+        Self::three() * Self::three()
+    }
+    #[inline]
+    fn twenty_seven() -> Self {
+        Self::nine() * Self::three()
+    }
+    #[inline]
+    fn two_third_pi() -> Self;
+    fn sqrt(self) -> Self;
+    /// The cubic root function is pow(x, 1/3) accepting negative arguments
+    fn cbrt(self) -> Self {
+        if self < Self::zero() {
+            -(-self).powf(Self::one_third())
+        } else {
+            self.powf(Self::one_third())
+        }
+    }
+    fn acos(self) -> Self;
+    fn cos(self) -> Self;
+    fn abs(self) -> Self;
+    fn powf(self, n: Self) -> Self;
 }
 
 impl FloatType for f32 {

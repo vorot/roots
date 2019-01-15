@@ -9,9 +9,8 @@
 // except according to those terms.
 
 use super::super::FloatType;
-use super::SearchError;
 use super::Convergency;
-
+use super::SearchError;
 
 /// Arrange two points so that the greatest value is first
 fn arrange<F: FloatType>(a: F, ya: F, b: F, yb: F) -> (F, F, F, F) {
@@ -55,13 +54,10 @@ fn arrange<F: FloatType>(a: F, ya: F, b: F, yb: F) -> (F, F, F, F) {
 /// let root2 = find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_brent<F, Func>(a: F,
-                                b: F,
-                                f: Func,
-                                convergency: &mut Convergency<F>)
-                                -> Result<F, SearchError>
-    where F: FloatType,
-          Func: Fn(F) -> F
+pub fn find_root_brent<F, Func>(a: F, b: F, f: Func, convergency: &mut Convergency<F>) -> Result<F, SearchError>
+where
+    F: FloatType,
+    Func: Fn(F) -> F,
 {
     let (mut a, mut ya, mut b, mut yb) = arrange(a, f(a), b, f(b));
     if ya * yb > F::zero() {
@@ -83,8 +79,7 @@ pub fn find_root_brent<F, Func>(a: F,
             return Ok(c);
         }
         let mut s = if (ya != yc) && (yb != yc) {
-            a * yb * yc / ((ya - yb) * (ya - yc)) + b * ya * yc / ((yb - ya) * (yb - yc)) +
-            c * ya * yb / ((yc - ya) * (yc - yb))
+            a * yb * yc / ((ya - yb) * (ya - yc)) + b * ya * yc / ((yb - ya) * (yb - yc)) + c * ya * yb / ((yc - ya) * (yc - yb))
         } else {
             b - yb * (b - a) / (yb - ya)
         };
@@ -137,8 +132,8 @@ pub fn find_root_brent<F, Func>(a: F,
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::super::*;
+    use super::*;
 
     #[test]
     fn test_find_root_brent() {
@@ -146,20 +141,15 @@ mod test {
         let mut conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_brent(10f64, 0f64, &f, &mut conv).ok().unwrap(),
-                         1f64);
+        assert_float_eq!(1e-15f64, find_root_brent(10f64, 0f64, &f, &mut conv).ok().unwrap(), 1f64);
         assert_eq!(10, conv.get_iter_count());
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_brent(-10f64, 0f64, &f, &mut conv).ok().unwrap(),
-                         -1f64);
+        assert_float_eq!(1e-15f64, find_root_brent(-10f64, 0f64, &f, &mut conv).ok().unwrap(), -1f64);
         assert_eq!(10, conv.get_iter_count());
 
         conv.reset();
-        assert_eq!(find_root_brent(10f64, 20f64, &f, &mut conv),
-                   Err(SearchError::NoBracketing));
+        assert_eq!(find_root_brent(10f64, 20f64, &f, &mut conv), Err(SearchError::NoBracketing));
         assert_eq!(0, conv.get_iter_count());
     }
 
@@ -167,15 +157,17 @@ mod test {
     fn test_find_root_brent_simple() {
         let f = |x| 1f64 * x * x - 1f64;
 
-        assert_float_eq!(1e-15f64,
-                         find_root_brent(10f64, 0f64, &f, &mut 1e-15f64).ok().unwrap(),
-                         1f64);
+        assert_float_eq!(1e-15f64, find_root_brent(10f64, 0f64, &f, &mut 1e-15f64).ok().unwrap(), 1f64);
 
-        assert_float_eq!(1e-15f64,
-                         find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64).ok().unwrap(),
-                         -1f64);
+        assert_float_eq!(
+            1e-15f64,
+            find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64).ok().unwrap(),
+            -1f64
+        );
 
-        assert_eq!(find_root_brent(10f64, 20f64, &f, &mut 1e-15f64),
-                   Err(SearchError::NoBracketing));
+        assert_eq!(
+            find_root_brent(10f64, 20f64, &f, &mut 1e-15f64),
+            Err(SearchError::NoBracketing)
+        );
     }
 }

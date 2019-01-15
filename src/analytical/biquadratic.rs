@@ -74,9 +74,10 @@ mod test {
     fn test_find_roots_biquadratic() {
         assert_eq!(find_roots_biquadratic(0f32, 0f32, 0f32), Roots::One([0f32]));
         assert_eq!(find_roots_biquadratic(1f32, 0f32, 1f32), Roots::No([]));
-        assert_eq!(find_roots_biquadratic(1f64, 0f64, -1f64),
-                   Roots::Two([-1f64, 1f64]));
-        assert_eq!(find_roots_biquadratic(1f64, -5f64, 4f64),
-                   Roots::Four([-2f64, -1f64, 1f64, 2f64]));
+        assert_eq!(find_roots_biquadratic(1f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
+        assert_eq!(
+            find_roots_biquadratic(1f64, -5f64, 4f64),
+            Roots::Four([-2f64, -1f64, 1f64, 2f64])
+        );
     }
 }

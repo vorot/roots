@@ -65,13 +65,17 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
         let a_pow_3 = a_pow_2 * a;
         let a_pow_4 = a_pow_2 * a_pow_2;
         let subst = -a3 / (F::four() * a4);
-        let (p, q, r) = ((_8 * b - F::three() * a_pow_2) / _8,
-                         (a_pow_3 - F::four() * a * b + _8 * c) / _8,
-                         (_256 * d - F::three() * a_pow_4 - _64 * c * a + _16 * a_pow_2 * b) /
-                         _256);
+        let (p, q, r) = (
+            (_8 * b - F::three() * a_pow_2) / _8,
+            (a_pow_3 - F::four() * a * b + _8 * c) / _8,
+            (_256 * d - F::three() * a_pow_4 - _64 * c * a + _16 * a_pow_2 * b) / _256,
+        );
 
         let mut roots = Roots::No([]);
-        for x in super::quartic_depressed::find_roots_quartic_depressed(p, q, r).as_ref().iter() {
+        for x in super::quartic_depressed::find_roots_quartic_depressed(p, q, r)
+            .as_ref()
+            .iter()
+        {
             roots = roots.add_new_root(*x + subst);
         }
         roots
@@ -84,12 +88,12 @@ mod test {
 
     #[test]
     fn test_find_roots_quartic() {
-        assert_eq!(find_roots_quartic(1f32, 0f32, 0f32, 0f32, 0f32),
-                   Roots::One([0f32]));
-        assert_eq!(find_roots_quartic(1f64, 0f64, 0f64, 0f64, -1f64),
-                   Roots::Two([-1f64, 1f64]));
-        assert_eq!(find_roots_quartic(1f64, -10f64, 35f64, -50f64, 24f64),
-                   Roots::Four([1f64, 2f64, 3f64, 4f64]));
+        assert_eq!(find_roots_quartic(1f32, 0f32, 0f32, 0f32, 0f32), Roots::One([0f32]));
+        assert_eq!(find_roots_quartic(1f64, 0f64, 0f64, 0f64, -1f64), Roots::Two([-1f64, 1f64]));
+        assert_eq!(
+            find_roots_quartic(1f64, -10f64, 35f64, -50f64, 24f64),
+            Roots::Four([1f64, 2f64, 3f64, 4f64])
+        );
 
         match find_roots_quartic(3f64, 5f64, -5f64, -5f64, 2f64) {
             Roots::Four(x) => {

@@ -23,11 +23,11 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use super::super::FloatType;
-use super::SearchError;
 use super::Convergency;
+use super::SearchError;
 
 /// Illinois modification to the classical method
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 enum Edge {
     /// Value is close to X1, reduce the Y1 weight
     EdgeX1,
@@ -70,13 +70,10 @@ enum Edge {
 /// let root2 = find_root_regula_falsi(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_regula_falsi<F, Func>(a: F,
-                                       b: F,
-                                       f: Func,
-                                       convergency: &mut Convergency<F>)
-                                       -> Result<F, SearchError>
-    where F: FloatType,
-          Func: Fn(F) -> F
+pub fn find_root_regula_falsi<F, Func>(a: F, b: F, f: Func, convergency: &mut Convergency<F>) -> Result<F, SearchError>
+where
+    F: FloatType,
+    Func: Fn(F) -> F,
 {
     let (mut x1, mut x2) = if a > b { (b, a) } else { (a, b) };
     let mut y1 = f(x1);
@@ -129,8 +126,8 @@ pub fn find_root_regula_falsi<F, Func>(a: F,
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::super::*;
+    use super::*;
 
     #[test]
     fn test_find_root_regula_falsi() {
@@ -138,21 +135,27 @@ mod test {
         let mut conv = debug_convergency::DebugConvergency::new(1e-15f64, 30);
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_regula_falsi(10f64, 0f64, &f, &mut conv).ok().unwrap(),
-                         1f64);
+        assert_float_eq!(
+            1e-15f64,
+            find_root_regula_falsi(10f64, 0f64, &f, &mut conv).ok().unwrap(),
+            1f64
+        );
         assert_eq!(11, conv.get_iter_count());
 
         conv.reset();
-        assert_float_eq!(1e-15f64,
-                         find_root_regula_falsi(-10f64, 0f64, &f, &mut conv).ok().unwrap(),
-                         -1f64);
+        assert_float_eq!(
+            1e-15f64,
+            find_root_regula_falsi(-10f64, 0f64, &f, &mut conv).ok().unwrap(),
+            -1f64
+        );
         assert_eq!(11, conv.get_iter_count());
 
         conv.reset();
-        assert_eq!(find_root_regula_falsi(10f64, 20f64, &f, &mut conv),
-                   Err(SearchError::NoBracketing));
-        let result=find_root_regula_falsi(10f64, 20f64, &f, &mut conv);
+        assert_eq!(
+            find_root_regula_falsi(10f64, 20f64, &f, &mut conv),
+            Err(SearchError::NoBracketing)
+        );
+        let result = find_root_regula_falsi(10f64, 20f64, &f, &mut conv);
         assert_eq!(result.unwrap_err().description(), "Initial values do not bracket zero");
         assert_eq!(0, conv.get_iter_count());
     }

@@ -25,7 +25,7 @@
 use super::super::FloatType;
 
 /// Sorted and unique list of roots of an equation.
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Roots<F: FloatType> {
     /// Equation has no roots
     No([F; 0]),
