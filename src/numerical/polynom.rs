@@ -49,6 +49,7 @@ where
     fn value_and_derivative(&self, x: &F) -> ValueAndDerivative<F>;
     fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut Convergency<F>) -> Result<F, SearchError>;
     fn derivative_polynom(&self) -> Vec<F>;
+    fn to_string(&self) -> String;
 }
 
 impl<F> Polynom<F> for [F]
@@ -157,6 +158,28 @@ where
             ni = ni + F::one();
         }
 
+        result
+    }
+
+    fn to_string(&self) -> String {
+        let mut result = String::new();
+        let mut p = self.len();
+
+        if self.len() == 0 {
+            result.push_str("x=0")
+        } else {
+            result.push_str(&format!("x^{:?}", p));
+            for x in self.iter() {
+                p = p - 1;
+                if *x != F::zero() {
+                    if *x > F::zero() {
+                        result.push_str(&format!("+{:?}*x^{:?}", *x, p));
+                    } else {
+                        result.push_str(&format!("-{:?}*x^{:?}", -*x, p));
+                    }
+                }
+            }
+        }
         result
     }
 }
