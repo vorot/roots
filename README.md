@@ -5,15 +5,18 @@ Library of well known algorithms for numerical root finding.
 ## Features
 
 - Iterative approximation:
-   - [Newton-Raphson](http://en.wikipedia.org/wiki/Newton%27s_method) method
-   - [Secant](http://en.wikipedia.org/wiki/Secant_method) method
-   - [Regula falsi](http://en.wikipedia.org/wiki/False_position_method) method (with Illinois modification)
-   - [Brent-Dekker](http://en.wikipedia.org/wiki/Brent%27s_method) method
+   - [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method) method
+   - [Secant](https://en.wikipedia.org/wiki/Secant_method) method
+   - [Regula falsi](https://en.wikipedia.org/wiki/False_position_method) method (with Illinois modification)
+   - [Brent-Dekker](https://en.wikipedia.org/wiki/Brent%27s_method) method
+   - [Inverse quadratic](https://en.wikipedia.org/wiki/Inverse_quadratic_interpolation) approximation
+   - Recursive [Sturm's](https://en.wikipedia.org/wiki/Sturm%27s_theorem) method
 - Solving polynomial equations
-   - [Linear](http://en.wikipedia.org/wiki/Linear_equation) equation (editors' choice)
-   - [Quadratic](http://en.wikipedia.org/wiki/Quadratic_equation) equation
-   - [Cubic](http://en.wikipedia.org/wiki/Cubic_function) equation
-   - [Quartic](http://en.wikipedia.org/wiki/Quartic_function) equation
+   - [Linear](https://en.wikipedia.org/wiki/Linear_equation) equation (editors' choice)
+   - [Quadratic](https://en.wikipedia.org/wiki/Quadratic_equation) equation
+   - [Cubic](https://en.wikipedia.org/wiki/Cubic_function) equation
+   - [Quartic](https://en.wikipedia.org/wiki/Quartic_function) equation
+   - [Eigenvalues](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors) method for higher-degree polynomials
 
 ## Usage
 

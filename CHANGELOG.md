@@ -1,9 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/).
+This project is going to adhere to [Semantic Versioning](http://semver.org/)
+after version 1.0.0.
 
 ## [Unreleased]
+
+## [0.0.5] - 2019-01-20
 * Trait Error implemented for SearchError - thanks to phillyfan1138
+* Find roots of higher-degree polynomials using eigenvalues - thanks to stiv-yakovenko
+* Find roots of higher-degree polynomials using Sturm's theorem recursively (experimental)
+* Inverse quadratic approximation
 
 ## [0.0.4] - 2017-09-05
 * Reduced the performance overhead by using generics - thanks to aepsil0n
@@ -21,7 +27,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.1] - 2015-03-24
 * Initial version
 
-[Unreleased]: https://github.com/vorot/roots/compare/v0.0.4...HEAD
+[Unreleased]: https://github.com/vorot/roots/compare/v0.0.5...HEAD
+[0.0.5]: https://github.com/vorot/roots/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/vorot/roots/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/vorot/roots/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/vorot/roots/compare/v0.0.1...v0.0.2
