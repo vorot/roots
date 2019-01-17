@@ -653,8 +653,8 @@ fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)> {
 }
 
 /// Find all roots of the polynomial by finding eigen numbers of the corresponding matrix.
-/// (Converted from Java by stivstivsti)
-pub fn solve_poly(c: Vec<f64>) -> VecDeque<f64> {
+/// (Converted from Java by stiv-yakovenko)
+pub fn find_roots_eigen(c: Vec<f64>) -> VecDeque<f64> {
     let n = c.len();
     let mut m = Matrix::new(n);
     for i in 0..(n - 1) {

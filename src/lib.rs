@@ -84,7 +84,7 @@ pub use self::analytical::roots::Roots;
 
 pub use self::numerical::brent::find_root_brent;
 pub use self::numerical::debug_convergency::DebugConvergency;
-pub use self::numerical::eigen::solve_poly;
+pub use self::numerical::eigen::find_roots_eigen;
 pub use self::numerical::inverse_quadratic::find_root_inverse_quadratic;
 pub use self::numerical::inverse_quadratic::Parabola;
 pub use self::numerical::newton_raphson::find_root_newton_raphson;
