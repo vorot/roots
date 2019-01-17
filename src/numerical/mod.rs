@@ -69,6 +69,10 @@ where
     fn is_converged(&self, convergency: &mut Convergency<F>) -> bool {
         convergency.is_converged(self.begin.x, self.end.x)
     }
+    /// Check if the given X is inside the interval
+    fn contains_x(&self, x: &F) -> bool {
+        *x <= self.end.x && *x >= self.begin.x
+    }
     /// Returns a point somewhere in middle of the interval for narrowing this interval down.
     /// Rules are as follows:
     /// * If the interval is bracketed, use the secant to find the middle point.
@@ -148,6 +152,7 @@ impl<F: FloatType> Convergency<F> for F {
 
 pub mod brent;
 pub mod eigen;
+pub mod inverse_quadratic;
 pub mod newton_raphson;
 pub mod polynom;
 pub mod regula_falsi;
