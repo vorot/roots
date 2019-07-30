@@ -4,6 +4,7 @@ This project is going to adhere to [Semantic Versioning](http://semver.org/)
 after version 1.0.0.
 
 ## [Unreleased]
+* Unnormalized cubic equations are solved using the general formula rather than trigonometrically - thanks to Logicalshift
 
 ## [0.0.5] - 2019-01-20
 * Trait Error implemented for SearchError - thanks to phillyfan1138
