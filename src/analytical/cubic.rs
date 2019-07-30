@@ -27,6 +27,10 @@ use super::super::Roots;
 
 /// Solves a cubic equation a3*x^3 + a2*x^2 + a1*x + a0 = 0.
 ///
+/// General formula (complex numbers) is implemented for three roots.
+///
+/// Note that very small values of a3 (comparing to other coefficients) will cause the loss of precision.
+///
 /// In case more than one roots are present, they are returned in the increasing order.
 ///
 /// # Examples
@@ -43,6 +47,14 @@ use super::super::Roots;
 ///
 /// let three_roots = find_roots_cubic(1f32, 0f32, -1f32, 0f32);
 /// // Returns Roots::Three([-1f32, 0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
+///
+/// let three_roots_less_precision = find_roots_cubic(
+///            -0.000000000000000040410628481035f64,
+///            0.0126298310280606f64,
+///            -0.100896606408756f64,
+///            0.0689539597036461f64);
+/// // Returns Roots::Three([0.7583841816097057f64, 7.233267996296344f64, 312537357195212.9f64])
+/// // while online math expects 0.7547108770537f64, 7.23404258961f64, 312537357195213f64
 /// ```
 pub fn find_roots_cubic<F: FloatType>(a3: F, a2: F, a1: F, a0: F) -> Roots<F> {
     // Handle non-standard cases
@@ -52,9 +64,58 @@ pub fn find_roots_cubic<F: FloatType>(a3: F, a2: F, a1: F, a0: F) -> Roots<F> {
     } else if a2 == F::zero() {
         // a2 = 0; a3*x^3+a1*x+a0=0; solve depressed cubic equation
         super::cubic_depressed::find_roots_cubic_depressed(a1 / a3, a0 / a3)
-    } else {
+    } else if a3 == F::one() {
         // solve normalized cubic expression
-        super::cubic_normalized::find_roots_cubic_normalized(a2 / a3, a1 / a3, a0 / a3)
+        super::cubic_normalized::find_roots_cubic_normalized(a2, a1, a0)
+    } else {
+        // standard case
+        let d = F::eighteen() * a3 * a2 * a1 * a0 - F::four() * a2 * a2 * a2 * a0 + a2 * a2 * a1 * a1
+            - F::four() * a3 * a1 * a1 * a1
+            - F::twenty_seven() * a3 * a3 * a0 * a0;
+        let d0 = a2 * a2 - F::three() * a3 * a1;
+        let d1 = F::two() * a2 * a2 * a2 - F::nine() * a3 * a2 * a1 + F::twenty_seven() * a3 * a3 * a0;
+        if d < F::zero() {
+            // one real root
+            let sqrt = (-F::twenty_seven() * a3 * a3 * d).sqrt();
+            let c = F::cbrt(if d1 < F::zero() { d1 - sqrt } else { d1 + sqrt } / F::two());
+            let x = -(a2 + c + d0 / c) / (F::three() * a3);
+            Roots::One([x])
+        } else if d == F::zero() {
+            // multiple roots
+            if d0 == F::zero() {
+                // triple root
+                Roots::One([-a2 / (a3 * F::three())])
+            } else {
+                // single root and double root
+                Roots::One([(F::nine() * a3 * a0 - a2 * a1) / (d0 * F::two())])
+                    .add_new_root((F::four() * a3 * a2 * a1 - F::nine() * a3 * a3 * a0 - a2 * a2 * a2) / (a3 * d0))
+            }
+        } else {
+            // three real roots
+            let c3_img = F::sqrt(F::twenty_seven() * a3 * a3 * d) / F::two();
+            let c3_real = d1 / F::two();
+            let c3_module = F::sqrt(c3_img * c3_img + c3_real * c3_real);
+            let c3_phase = F::two() * F::atan(c3_img / (c3_real + c3_module));
+            let c_module = F::cbrt(c3_module);
+            let c_phase = c3_phase / F::three();
+            let c_real = c_module * F::cos(c_phase);
+            let c_img = c_module * F::sin(c_phase);
+            let x0_real = -(a2 + c_real + (d0 * c_real) / (c_module * c_module)) / (F::three() * a3);
+            // unused let x0_img = -(c_img - (d0 * c_img) / (c_module * c_module)) / (F::three() * a3);
+            let e_real = -F::one() / F::two();
+            let e_img = F::sqrt(F::three()) / F::two();
+            let c1_real = c_real * e_real - c_img * e_img;
+            let c1_img = c_real * e_img + c_img * e_real;
+            let x1_real = -(a2 + c1_real + (d0 * c1_real) / (c1_real * c1_real + c1_img * c1_img)) / (F::three() * a3);
+            // unused let x1_img = -(c1_img - (d0 * c1_img) / (c1_real * c1_real + c1_img * c1_img)) / (F::three() * a3);
+
+            let c2_real = c1_real * e_real - c1_img * e_img;
+            let c2_img = c1_real * e_img + c1_img * e_real;
+            let x2_real = -(a2 + c2_real + (d0 * c2_real) / (c2_real * c2_real + c2_img * c2_img)) / (F::three() * a3);
+            // unused let x2_img = -(c2_img - (d0 * c2_img) / (c2_real * c2_real + c2_img * c2_img)) / (F::three() * a3);
+
+            Roots::One([x0_real]).add_new_root(x1_real).add_new_root(x2_real)
+        }
     }
 }
 
@@ -69,6 +130,27 @@ mod test {
         match find_roots_cubic(1f64, 0f64, -1f64, 0f64) {
             Roots::Three(x) => {
                 assert_float_array_eq!(1e-15, x, [-1f64, 0f64, 1f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_find_roots_cubic_small_discriminant() {
+        // Try to find roots of the cubic polynomial where the highest coefficient is very small
+        // (as reported by Andrew Hunter in July 2019)
+        match find_roots_cubic(
+            -0.000000000000000040410628481035f64,
+            0.0126298310280606f64,
+            -0.100896606408756f64,
+            0.0689539597036461f64,
+        ) {
+            Roots::Three(x) => {
+                // (According to Wolfram Alpha, roots must be 0.7547108770537f64, 7.23404258961f64, 312537357195213f64)
+                // Actual result differ a little due to the limited precision of calculations.
+                assert_float_array_eq!(1e-8, x, [0.7583841816097057f64, 7.233267996296344f64, 312537357195212.9f64]);
             }
             _ => {
                 assert!(false);

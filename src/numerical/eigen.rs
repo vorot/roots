@@ -652,8 +652,19 @@ fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)> {
     r
 }
 
-/// Find all roots of the polynomial by finding eigen numbers of the corresponding matrix.
+/// Find all roots of the normalized polynomial by finding eigen numbers of the corresponding matrix.
 /// (Converted from Java by stiv-yakovenko)
+///
+/// Note that found roots are approximate and not sorted.
+///
+/// # Examples
+///
+/// ```
+/// use roots::find_roots_eigen;
+///
+/// let roots = find_roots_eigen(vec!(0f64, -1f64, 0f64));
+/// // Returns [0f64, 0.9999999999999999f64, -0.9999999999999999f64] while 'x^3 - x = 0' has roots -1, 0, and 1
+/// ```
 pub fn find_roots_eigen(c: Vec<f64>) -> VecDeque<f64> {
     let n = c.len();
     let mut m = Matrix::new(n);
@@ -671,4 +682,33 @@ pub fn find_roots_eigen(c: Vec<f64>) -> VecDeque<f64> {
         }
     }
     r
+}
+
+#[cfg(test)]
+mod test {
+    use super::super::super::*;
+
+    #[test]
+    fn test_find_roots_eigen() {
+        let roots = find_roots_eigen(vec![0f64, -1f64, 0f64]);
+        assert_eq!(roots[0], 0f64);
+        assert_eq!(roots[1], 0.9999999999999999f64);
+        assert_eq!(roots[2], -0.9999999999999999f64);
+    }
+
+    #[test]
+    fn test_find_roots_eigen_huge_discriminant() {
+        // Try to find roots of the normalized cubic polynomial where the highest coefficient was very small
+        // (as reported by Andrew Hunter in July 2019)
+        let roots = find_roots_eigen(vec![
+            0.0126298310280606f64 / -0.000000000000000040410628481035f64,
+            -0.100896606408756f64 / -0.000000000000000040410628481035f64,
+            0.0689539597036461f64 / -0.000000000000000040410628481035f64,
+        ]);
+        // (According to Wolfram Alpha, roots must be 0.7547108770537f64, 7.23404258961f64, 312537357195213f64)
+        // This means that this function cannot handle such huge numbers.
+        assert_eq!(roots[0], 0f64);
+        assert_eq!(roots[1], 1.5f64);
+        assert_eq!(roots[2], 1706332276816893f64);
+    }
 }

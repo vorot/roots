@@ -27,6 +27,8 @@ use super::super::Roots;
 
 /// Solves a normalized cubic equation x^3 + a2*x^2 + a1*x + a0 = 0.
 ///
+/// Trigonometric solution (arccos/cos) is implemented for three roots.
+///
 /// In case more than one roots are present, they are returned in the increasing order.
 ///
 /// # Examples
@@ -117,6 +119,31 @@ mod test {
                         2.813606502648330815441228f64
                     ]
                 );
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_find_roots_cubic_normalized_huge_discriminant() {
+        // Try to find roots of the cubic polynomial where the highest coefficient is very small
+        // (as reported by Andrew Hunter in July 2019)
+        match find_roots_cubic_normalized(
+            0.0126298310280606f64 / -0.000000000000000040410628481035f64,
+            -0.100896606408756f64 / -0.000000000000000040410628481035f64,
+            0.0689539597036461f64 / -0.000000000000000040410628481035f64,
+        ) {
+            //Roots::Three(x) => {
+            //    // (According to Wolfram Alpha, roots must be 0.7547108770537f64, 7.23404258961f64, 312537357195213f64)
+            //    // These results are returned by find_roots_cubic (using complex numbers).
+            //    assert_float_array_eq!(1e-8, x, [0.7583841816097057f64, 7.233267996296344f64, 312537357195212.9f64]);
+            //}
+            Roots::One(x) => {
+                // (According to Wolfram Alpha, roots must be 0.7547108770537f64, 7.23404258961f64, 312537357195213f64)
+                // Due to the limited precision of calculations of arccos, the function cannot cope with such numbers.
+                assert_float_array_eq!(1e-8, x, [312537357195212.4625f64]);
             }
             _ => {
                 assert!(false);

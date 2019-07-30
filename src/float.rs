@@ -69,6 +69,10 @@ pub trait FloatType:
         Self::three() * Self::three()
     }
     #[inline]
+    fn eighteen() -> Self {
+        Self::nine() * Self::two()
+    }
+    #[inline]
     fn twenty_seven() -> Self {
         Self::nine() * Self::three()
     }
@@ -83,7 +87,9 @@ pub trait FloatType:
             self.powf(Self::one_third())
         }
     }
+    fn atan(self) -> Self;
     fn acos(self) -> Self;
+    fn sin(self) -> Self;
     fn cos(self) -> Self;
     fn abs(self) -> Self;
     fn powf(self, n: Self) -> Self;
@@ -125,8 +131,14 @@ impl FloatType for f32 {
     fn sqrt(self) -> Self {
         self.sqrt()
     }
+    fn atan(self) -> Self {
+        self.atan()
+    }
     fn acos(self) -> Self {
         self.acos()
+    }
+    fn sin(self) -> Self {
+        self.sin()
     }
     fn cos(self) -> Self {
         self.cos()
@@ -175,8 +187,14 @@ impl FloatType for f64 {
     fn sqrt(self) -> Self {
         self.sqrt()
     }
+    fn atan(self) -> Self {
+        self.atan()
+    }
     fn acos(self) -> Self {
         self.acos()
+    }
+    fn sin(self) -> Self {
+        self.sin()
     }
     fn cos(self) -> Self {
         self.cos()
