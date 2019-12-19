@@ -44,6 +44,7 @@ pub fn find_roots_quartic_depressed<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<
     // Handle non-standard cases
     if a1 == F::zero() {
         // a1 = 0; x^4 + a2*x^2 + a0 = 0; solve biquadratic equation
+        println!("biquadratic x^4+{:?}x^2+{:?}",a2,a0);
         super::biquadratic::find_roots_biquadratic(F::one(), a2, a0)
     } else if a0 == F::zero() {
         // a0 = 0; x^4 + a2*x^2 + a1*x = 0; reduce to normalized cubic and add zero root
@@ -52,24 +53,26 @@ pub fn find_roots_quartic_depressed<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<
         // Solve the auxiliary equation y^3 + (5/2)*a2*y^2 + (2*a2^2-a0)*y + (a2^3/2 - a2*a0/2 - a1^2/8) = 0
         let a2_pow_2 = a2 * a2;
         let a1_div_2 = a1 / F::two();
-        let (b2, b1, b0) = (
-            a2 * F::five() / F::two(),
-            F::two() * a2_pow_2 - a0,
-            (a2_pow_2 * a2 - a2 * a0 - a1_div_2 * a1_div_2) / F::two(),
-        );
+        let b2 = a2 * F::five() / F::two();
+        let b1 = F::two() * a2_pow_2 - a0;
+        let b0 = (a2_pow_2 * a2 - a2 * a0 - a1_div_2 * a1_div_2) / F::two();
 
         // At least one root always exists. The last root is the maximal one.
-        let y = *super::cubic_normalized::find_roots_cubic_normalized(b2, b1, b0)
+        let resolvent_roots = super::cubic_normalized::find_roots_cubic_normalized(b2, b1, b0);
+        let y = resolvent_roots
             .as_ref()
             .iter()
             .last()
             .unwrap();
+        
+        println!("auxiliary x^3+{:?}x^2+{:?}x+{:?} -> {:?}",b2,b1,b0,resolvent_roots);
 
-        let _a2_plus_2y = a2 + F::two() * y;
+        let _a2_plus_2y = a2 + F::two() * *y;
+        println!("_a2_plus_2y {:?}",_a2_plus_2y);
         if _a2_plus_2y > F::zero() {
             let sqrt_a2_plus_2y = _a2_plus_2y.sqrt();
-            let q0a = a2 + y - a1_div_2 / sqrt_a2_plus_2y;
-            let q0b = a2 + y + a1_div_2 / sqrt_a2_plus_2y;
+            let q0a = a2 + *y - a1_div_2 / sqrt_a2_plus_2y;
+            let q0b = a2 + *y + a1_div_2 / sqrt_a2_plus_2y;
 
             let mut roots = super::quadratic::find_roots_quadratic(F::one(), sqrt_a2_plus_2y, q0a);
             for x in super::quadratic::find_roots_quadratic(F::one(), -sqrt_a2_plus_2y, q0b)
