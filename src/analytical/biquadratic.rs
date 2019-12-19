@@ -52,9 +52,11 @@ pub fn find_roots_biquadratic<F: FloatType>(a4: F, a2: F, a0: F) -> Roots<F> {
         // a0 = 0; a4*x^4 + a2*x^2 = 0; solve quadratic equation and add zero root
         super::quadratic::find_roots_quadratic(a4, F::zero(), a2).add_new_root(F::zero())
     } else {
+        println!("biquadratic {:?}x^4+{:?}x^2+{:?}",a4,a2,a0);
         // solve the corresponding quadratic equation and order roots
         let mut roots = Roots::No([]);
         for x in super::quadratic::find_roots_quadratic(a4, a2, a0).as_ref().iter() {
+            println!("Biquadratic root {:?}",*x);
             if *x > F::zero() {
                 let sqrt_x = x.sqrt();
                 roots = roots.add_new_root(-sqrt_x).add_new_root(sqrt_x);
