@@ -106,22 +106,15 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
         let _256 = _192 + _64;
         // Discriminant
         // https://en.wikipedia.org/wiki/Quartic_function#Nature_of_the_roots
-        let discriminant = dbg!(_256 * dbg!(a4) * a4 * a4 * a0 * a0 * a0)
-            - dbg!(_192 * a4 * a4 * dbg!(a3) * a1 * a0 * a0)
-            - dbg!(_128 * a4 * a4 * dbg!(a2) * a2 * a0 * a0)
-            + dbg!(_144 * a4 * a4 * a2 * dbg!(a1) * a1 * a0)
-            - dbg!(_27 * a4 * a4 * a1 * a1 * a1 * a1)
-            + dbg!(_144 * a4 * a3 * a3 * a2 * dbg!(a0) * a0)
-            - dbg!(_6 * a4 * a3 * a3 * a1 * a1 * a0)
-            - dbg!(_80 * a4 * a3 * a2 * a2 * a1 * a0)
-            + dbg!(_18 * a4 * a3 * a2 * a1 * a1 * a1)
-            + dbg!(_16 * a4 * a2 * a2 * a2 * a2 * a0)
-            - dbg!(_4 * a4 * a2 * a2 * a2 * a1 * a1)
-            - dbg!(_27 * a3 * a3 * a3 * a3 * a0 * a0)
-            + dbg!(_18 * a3 * a3 * a3 * a2 * a1 * a0)
-            - dbg!(_4 * a3 * a3 * a3 * a1 * a1 * a1)
-            - dbg!(_4 * a3 * a3 * a2 * a2 * a2 * a0)
-            + dbg!(a3 * a3 * a2 * a2 * a1 * a1);
+        let discriminant = dbg!(a4 * a0 * a4 * (_256 * a4 * a0 * a0 - _192 * dbg!(a3) * a1 * a0 + _144 * a2 * dbg!(a1) * a1))
+            + dbg!(a4 * a0 * a2 * a2 * (_16 * a2 * a2 - _80 * a3 * a1 - _128 * a4 * a0))
+            + dbg!(
+                a3 * a3
+                    * (a4 * a0 * (_144 * a2 * a0 - _6 * a1 * a1)
+                        + (a0 * (_18 * a3 * a2 * a1 - _27 * a3 * a3 * a0 - _4 * a2 * a2 * a2)
+                            + a1 * a1 * (a2 * a2 - _4 * a3 * a1)))
+            )
+            + dbg!(a4 * a1 * a1 * (_18 * a3 * a2 * a1 - _27 * a4 * a1 * a1 - _4 * a2 * a2 * a2));
         let pp = _8 * a4 * a2 - _3 * a3 * a3;
         let rr = a3 * a3 * a3 + _8 * a4 * a4 * a1 - _4 * a4 * a3 * a2;
         let delta0 = a2 * a2 - _3 * a3 * a1 + _12 * a4 * a0;
