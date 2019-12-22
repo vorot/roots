@@ -125,9 +125,7 @@ where
     // Iterate quadratically
     let mut iter = 0;
     loop {
-        println! {"interval:{:?}, middle:{:?}",interval,sample3};
-        let parabola = Parabola::from_three_points(&interval.begin, &interval.end, &sample3);
-        println! {"parabola:{:?}",parabola};
+        let parabola = dbg!(Parabola::from_three_points(dbg!(&interval.begin), dbg!(&interval.end), dbg!(&sample3)));
 
         // Find the new approximation quadratically
         x3 = if let Some(root) = find_roots_quadratic(parabola.a, parabola.b, parabola.c)
@@ -135,12 +133,10 @@ where
             .iter()
             .find(|x| interval.contains_x(x))
         {
-            println! {"root:{:?}",root};
-            *root
+            dbg!(*root)
         } else {
             // no roots inside interval, fallback to linear approximation
-            println! {"fallback middle:{:?}",interval.middle()};
-            interval.middle()
+            dbg!(interval.middle())
         };
 
         // calculate the approximated value
