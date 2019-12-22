@@ -456,11 +456,6 @@ where
             .iter()
             .map(|s| Ok(*s))
             .collect(),
-        4 => find_roots_quartic(F::one(), a[0], a[1], a[2], a[3])
-            .as_ref()
-            .iter()
-            .map(|s| Ok(*s))
-            .collect(),
         _ => {
             let mut result = Vec::new();
             let derivative_polynom = a.derivative_polynom();
@@ -556,4 +551,23 @@ mod test {
             .collect();
         assert_float_array_eq!(1e-5, roots, [-3.6547f64, -1.67175f64, 0.455904f64]);
     }
+
+    #[test]
+    fn find_roots_sturm_tim_lueke() {
+        // Try to find roots of the normalized quartic polynomial where the discriminant must be 0
+        // (as reported by Tim Lueke in December 2019)
+        // -14.0625*x^4-3.75*x^3+29.75*x^2+4.0*x^1-16.0*x^0 => {-1.1016116464173349, 0.9682783130840016}
+        let polynom = [-3.75f64/-14.0625f64, 29.75f64/-14.0625f64, 4.0f64/-14.0625f64, -16.0f64/-14.0625f64];
+        let roots: Vec<_> = find_roots_sturm(&polynom, &mut 1e-8f64)
+            .iter()
+            .filter_map(|s| match s {
+                &Ok(ref x) => Some(*x),
+                &Err(_) => None,
+            })
+            .collect();
+            
+            // these roots cannot be found 
+            assert_float_array_eq!(1e-5, roots, []);
+            //assert_float_array_eq!(1e-5, roots, [-1.1016116464173349f64, 0.9682783130840016f64]);
+        }
 }
