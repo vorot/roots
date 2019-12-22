@@ -41,23 +41,31 @@ use super::super::Roots;
 /// // Returns Roots::Three([-1f32, -0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
 pub fn find_roots_cubic_depressed<F: FloatType>(a1: F, a0: F) -> Roots<F> {
+    let _2 = F::from(2i16);
+    let _3 = F::from(3i16);
+    let _4 = F::from(4i16);
+    let _9 = F::from(9i16);
+    let _18 = F::from(18i16);
+    let _27 = F::from(27i16);
+    let _54 = F::from(54i16);
+
     if a1 == F::zero() {
         Roots::One([-a0.cbrt()])
     } else if a0 == F::zero() {
         super::quadratic::find_roots_quadratic(F::one(), F::zero(), a1).add_new_root(F::zero())
     } else {
-        let d = a0 * a0 / F::four() + a1 * a1 * a1 / F::twenty_seven();
+        let d = a0 * a0 / _4 + a1 * a1 * a1 / _27;
         if d < F::zero() {
             // n*a0^2 + m*a1^3 < 0 => a1 < 0
-            let a = (-F::four() * a1 / F::three()).sqrt();
+            let a = (-_4 * a1 / _3).sqrt();
 
-            let phi = (-F::four() * a0 / (a * a * a)).acos() / F::three();
+            let phi = (-_4 * a0 / (a * a * a)).acos() / _3;
             Roots::One([a * phi.cos()])
                 .add_new_root(a * (phi + F::two_third_pi()).cos())
                 .add_new_root(a * (phi - F::two_third_pi()).cos())
         } else {
             let sqrt_d = d.sqrt();
-            let a0_div_2 = a0 / F::two();
+            let a0_div_2 = a0 / _2;
             let x1 = (sqrt_d - a0_div_2).cbrt() - (sqrt_d + a0_div_2).cbrt();
             if d == F::zero() {
                 // one real root and one double root

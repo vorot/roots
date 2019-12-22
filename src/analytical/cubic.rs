@@ -68,51 +68,56 @@ pub fn find_roots_cubic<F: FloatType>(a3: F, a2: F, a1: F, a0: F) -> Roots<F> {
         // solve normalized cubic expression
         super::cubic_normalized::find_roots_cubic_normalized(a2, a1, a0)
     } else {
+        let _2 = F::from(2i16);
+        let _3 = F::from(3i16);
+        let _4 = F::from(4i16);
+        let _9 = F::from(9i16);
+        let _18 = F::from(18i16);
+        let _27 = F::from(27i16);
+
         // standard case
-        let d = F::eighteen() * a3 * a2 * a1 * a0 - F::four() * a2 * a2 * a2 * a0 + a2 * a2 * a1 * a1
-            - F::four() * a3 * a1 * a1 * a1
-            - F::twenty_seven() * a3 * a3 * a0 * a0;
-        let d0 = a2 * a2 - F::three() * a3 * a1;
-        let d1 = F::two() * a2 * a2 * a2 - F::nine() * a3 * a2 * a1 + F::twenty_seven() * a3 * a3 * a0;
+        let d = _18 * a3 * a2 * a1 * a0 - _4 * a2 * a2 * a2 * a0 + a2 * a2 * a1 * a1
+            - _4 * a3 * a1 * a1 * a1
+            - _27 * a3 * a3 * a0 * a0;
+        let d0 = a2 * a2 - _3 * a3 * a1;
+        let d1 = _2 * a2 * a2 * a2 - _9 * a3 * a2 * a1 + _27 * a3 * a3 * a0;
         if d < F::zero() {
             // one real root
-            let sqrt = (-F::twenty_seven() * a3 * a3 * d).sqrt();
-            let c = F::cbrt(if d1 < F::zero() { d1 - sqrt } else { d1 + sqrt } / F::two());
-            let x = -(a2 + c + d0 / c) / (F::three() * a3);
+            let sqrt = (-_27 * a3 * a3 * d).sqrt();
+            let c = F::cbrt(if d1 < F::zero() { d1 - sqrt } else { d1 + sqrt } / _2);
+            let x = -(a2 + c + d0 / c) / (_3 * a3);
             Roots::One([x])
         } else if d == F::zero() {
             // multiple roots
             if d0 == F::zero() {
                 // triple root
-                Roots::One([-a2 / (a3 * F::three())])
+                Roots::One([-a2 / (a3 * _3)])
             } else {
                 // single root and double root
-                Roots::One([(F::nine() * a3 * a0 - a2 * a1) / (d0 * F::two())])
-                    .add_new_root((F::four() * a3 * a2 * a1 - F::nine() * a3 * a3 * a0 - a2 * a2 * a2) / (a3 * d0))
+                Roots::One([(_9 * a3 * a0 - a2 * a1) / (d0 * _2)])
+                    .add_new_root((_4 * a3 * a2 * a1 - _9 * a3 * a3 * a0 - a2 * a2 * a2) / (a3 * d0))
             }
         } else {
             // three real roots
-            let c3_img = F::sqrt(F::twenty_seven() * a3 * a3 * d) / F::two();
-            let c3_real = d1 / F::two();
+            let c3_img = F::sqrt(_27 * a3 * a3 * d) / _2;
+            let c3_real = d1 / _2;
             let c3_module = F::sqrt(c3_img * c3_img + c3_real * c3_real);
-            let c3_phase = F::two() * F::atan(c3_img / (c3_real + c3_module));
+            let c3_phase = _2 * F::atan(c3_img / (c3_real + c3_module));
             let c_module = F::cbrt(c3_module);
-            let c_phase = c3_phase / F::three();
+            let c_phase = c3_phase / _3;
             let c_real = c_module * F::cos(c_phase);
             let c_img = c_module * F::sin(c_phase);
-            let x0_real = -(a2 + c_real + (d0 * c_real) / (c_module * c_module)) / (F::three() * a3);
-            // unused let x0_img = -(c_img - (d0 * c_img) / (c_module * c_module)) / (F::three() * a3);
-            let e_real = -F::one() / F::two();
-            let e_img = F::sqrt(F::three()) / F::two();
+            let x0_real = -(a2 + c_real + (d0 * c_real) / (c_module * c_module)) / (_3 * a3);
+
+            let e_real = -F::one() / _2;
+            let e_img = F::sqrt(_3) / _2;
             let c1_real = c_real * e_real - c_img * e_img;
             let c1_img = c_real * e_img + c_img * e_real;
-            let x1_real = -(a2 + c1_real + (d0 * c1_real) / (c1_real * c1_real + c1_img * c1_img)) / (F::three() * a3);
-            // unused let x1_img = -(c1_img - (d0 * c1_img) / (c1_real * c1_real + c1_img * c1_img)) / (F::three() * a3);
+            let x1_real = -(a2 + c1_real + (d0 * c1_real) / (c1_real * c1_real + c1_img * c1_img)) / (_3 * a3);
 
             let c2_real = c1_real * e_real - c1_img * e_img;
             let c2_img = c1_real * e_img + c1_img * e_real;
-            let x2_real = -(a2 + c2_real + (d0 * c2_real) / (c2_real * c2_real + c2_img * c2_img)) / (F::three() * a3);
-            // unused let x2_img = -(c2_img - (d0 * c2_img) / (c2_real * c2_real + c2_img * c2_img)) / (F::three() * a3);
+            let x2_real = -(a2 + c2_real + (d0 * c2_real) / (c2_real * c2_real + c2_img * c2_img)) / (_3 * a3);
 
             Roots::One([x0_real]).add_new_root(x1_real).add_new_root(x2_real)
         }

@@ -51,31 +51,9 @@ pub trait FloatType:
     #[inline]
     fn one() -> Self;
     #[inline]
-    fn two() -> Self;
-    #[inline]
-    fn three() -> Self;
-    #[inline]
-    fn pi() -> Self;
-    #[inline]
     fn one_third() -> Self;
     #[inline]
-    fn four() -> Self;
-    #[inline]
-    fn five() -> Self {
-        Self::two() + Self::three()
-    }
-    #[inline]
-    fn nine() -> Self {
-        Self::three() * Self::three()
-    }
-    #[inline]
-    fn eighteen() -> Self {
-        Self::nine() * Self::two()
-    }
-    #[inline]
-    fn twenty_seven() -> Self {
-        Self::nine() * Self::three()
-    }
+    fn pi() -> Self;
     #[inline]
     fn two_third_pi() -> Self;
     fn sqrt(self) -> Self;
@@ -107,18 +85,6 @@ impl FloatType for f32 {
     #[inline]
     fn one() -> Self {
         1f32
-    }
-    #[inline]
-    fn two() -> Self {
-        2f32
-    }
-    #[inline]
-    fn three() -> Self {
-        3f32
-    }
-    #[inline]
-    fn four() -> Self {
-        4f32
     }
     #[inline]
     fn two_third_pi() -> Self {
@@ -163,18 +129,6 @@ impl FloatType for f64 {
     #[inline]
     fn one() -> Self {
         1f64
-    }
-    #[inline]
-    fn two() -> Self {
-        2f64
-    }
-    #[inline]
-    fn three() -> Self {
-        3f64
-    }
-    #[inline]
-    fn four() -> Self {
-        4f64
     }
     #[inline]
     fn two_third_pi() -> Self {

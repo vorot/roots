@@ -260,7 +260,7 @@ where
                     });
                 }
             };
-            step = step * F::two();
+            step = step * F::from(2i16);
             next_x = next_x + step;
             iter = iter + 1;
             if convergency.is_iteration_limit_reached(iter) {
@@ -310,7 +310,7 @@ where
         &SearchInterval::Middle(ref interval) => {
             if interval.is_bracketed() {
                 let middle_x = if interval.begin.y == interval.end.y {
-                    (interval.begin.x + interval.end.x) / F::two()
+                    (interval.begin.x + interval.end.x) / F::from(2i16)
                 } else {
                     interval.begin.x - interval.begin.y * (interval.end.x - interval.begin.x) / (interval.end.y - interval.begin.y)
                 };
