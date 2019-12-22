@@ -6,6 +6,12 @@ after version 1.0.0.
 ## [Unreleased]
 * Unnormalized cubic equations are solved using the general formula rather than trigonometrically - thanks to Logicalshift
 
+## [0.0.6] - 2019-12-22
+* Fixed cubic equations with very small a3 - thanks to Andrew Hunter
+* Improved quartic equations with multiple roots (for f64; f32 is still a problem) - thanks to Tim Lueke
+* Removed warnings of rustc 1.40.0
+* Switched benchmarks from Bencher to Criterion
+
 ## [0.0.5] - 2019-01-20
 * Trait Error implemented for SearchError - thanks to phillyfan1138
 * Find roots of higher-degree polynomials using eigenvalues - thanks to stiv-yakovenko
@@ -28,7 +34,8 @@ after version 1.0.0.
 ## [0.0.1] - 2015-03-24
 * Initial version
 
-[Unreleased]: https://github.com/vorot/roots/compare/v0.0.5...HEAD
+[Unreleased]: https://github.com/vorot/roots/compare/v0.0.6...HEAD
+[0.0.6]: https://github.com/vorot/roots/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/vorot/roots/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/vorot/roots/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/vorot/roots/compare/v0.0.2...v0.0.3

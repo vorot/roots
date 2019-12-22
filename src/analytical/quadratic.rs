@@ -54,8 +54,8 @@ pub fn find_roots_quadratic<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<F> {
         let _4 = F::from(4i16);
 
         // Rust lacks a simple way to convert an integer constant to generic type F
-        let discriminant = dbg!(a1) * a1 - _4 * dbg!(a2) * dbg!(a0);
-        if dbg!(discriminant) < F::zero() {
+        let discriminant = a1 * a1 - _4 * a2 * a0;
+        if discriminant < F::zero() {
             Roots::No([])
         } else {
             let a2x2 = _2 * a2;

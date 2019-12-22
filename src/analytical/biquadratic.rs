@@ -47,14 +47,14 @@ pub fn find_roots_biquadratic<F: FloatType>(a4: F, a2: F, a0: F) -> Roots<F> {
     // Handle non-standard cases
     if a4 == F::zero() {
         // a4 = 0; a2*x^2 + a0 = 0; solve quadratic equation
-        dbg!(super::quadratic::find_roots_quadratic(dbg!(a2), F::zero(), dbg!(a0)))
+        super::quadratic::find_roots_quadratic(a2, F::zero(), a0)
     } else if a0 == F::zero() {
         // a0 = 0; a4*x^4 + a2*x^2 = 0; solve quadratic equation and add zero root
-        dbg!(super::quadratic::find_roots_quadratic(dbg!(a4), F::zero(), dbg!(a2)).add_new_root(F::zero()))
+        super::quadratic::find_roots_quadratic(a4, F::zero(), a2).add_new_root(F::zero())
     } else {
         // solve the corresponding quadratic equation and order roots
         let mut roots = Roots::No([]);
-        for x in dbg!(super::quadratic::find_roots_quadratic(dbg!(a4), dbg!(a2), dbg!(a0))).as_ref().iter() {
+        for x in super::quadratic::find_roots_quadratic(a4, a2, a0).as_ref().iter() {
             if *x > F::zero() {
                 let sqrt_x = x.sqrt();
                 roots = roots.add_new_root(-sqrt_x).add_new_root(sqrt_x);
@@ -62,7 +62,7 @@ pub fn find_roots_biquadratic<F: FloatType>(a4: F, a2: F, a0: F) -> Roots<F> {
                 roots = roots.add_new_root(F::zero());
             }
         }
-        dbg!(roots)
+        roots
     }
 }
 
