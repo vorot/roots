@@ -43,15 +43,23 @@ use super::super::Roots;
 /// // Returns Roots::Three([-1f32, -0f32, 1f32]) as 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
 pub fn find_roots_cubic_normalized<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<F> {
-    let q = (F::three() * a1 - a2 * a2) / F::nine();
-    let r = (F::nine() * a2 * a1 - F::twenty_seven() * a0 - F::two() * a2 * a2 * a2) / (F::two() * F::twenty_seven());
+    let _2 = F::from(2i16);
+    let _3 = F::from(3i16);
+    let _4 = F::from(4i16);
+    let _9 = F::from(9i16);
+    let _18 = F::from(18i16);
+    let _27 = F::from(27i16);
+    let _54 = F::from(54i16);
+
+    let q = (_3 * a1 - a2 * a2) / _9;
+    let r = (_9 * a2 * a1 - _27 * a0 - _2 * a2 * a2 * a2) / _54;
     let q3 = q * q * q;
     let d = q3 + r * r;
-    let a2_div_3 = a2 / F::three();
+    let a2_div_3 = a2 / _3;
 
     if d < F::zero() {
-        let phi_3 = (r / (-q3).sqrt()).acos() / F::three();
-        let sqrt_q_2 = F::two() * (-q).sqrt();
+        let phi_3 = (r / (-q3).sqrt()).acos() / _3;
+        let sqrt_q_2 = _2 * (-q).sqrt();
 
         Roots::One([sqrt_q_2 * phi_3.cos() - a2_div_3])
             .add_new_root(sqrt_q_2 * (phi_3 - F::two_third_pi()).cos() - a2_div_3)
@@ -65,7 +73,7 @@ pub fn find_roots_cubic_normalized<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<F
             if s + t == F::zero() {
                 Roots::One([s + t - a2_div_3])
             } else {
-                Roots::One([s + t - a2_div_3]).add_new_root(-(s + t) / F::two() - a2_div_3)
+                Roots::One([s + t - a2_div_3]).add_new_root(-(s + t) / _2 - a2_div_3)
             }
         } else {
             Roots::One([s + t - a2_div_3])

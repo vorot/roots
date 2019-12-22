@@ -67,6 +67,10 @@ where
     let (mut c, mut yc, mut d) = (a, ya, a);
     let mut flag = true;
 
+    let _2 = F::from(2i16);
+    let _3 = F::from(3i16);
+    let _4 = F::from(4i16);
+
     let mut iter = 0;
     loop {
         if convergency.is_root_found(ya) {
@@ -84,14 +88,14 @@ where
             b - yb * (b - a) / (yb - ya)
         };
 
-        let cond1 = (s - b) * (s - (F::three() * a + b) / F::four()) > F::zero();
-        let cond2 = flag && (s - b).abs() >= (b - c).abs() / F::two();
-        let cond3 = !flag && (s - b).abs() >= (c - d).abs() / F::two();
+        let cond1 = (s - b) * (s - (_3 * a + b) / _4) > F::zero();
+        let cond2 = flag && (s - b).abs() >= (b - c).abs() / _2;
+        let cond3 = !flag && (s - b).abs() >= (c - d).abs() / _2;
         let cond4 = flag && convergency.is_converged(b, c);
         let cond5 = !flag && convergency.is_converged(c, d);
 
         if cond1 || cond2 || cond3 || cond4 || cond5 {
-            s = (a + b) / F::two();
+            s = (a + b) / _2;
             flag = true;
         } else {
             flag = false;

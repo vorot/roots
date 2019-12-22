@@ -75,6 +75,7 @@ where
     F: FloatType,
     Func: Fn(F) -> F,
 {
+    let _2 = F::from(2i16);
     let (mut x1, mut x2) = if a > b { (b, a) } else { (a, b) };
     let mut y1 = f(x1);
     if convergency.is_root_found(y1) {
@@ -103,14 +104,14 @@ where
             x1 = x;
             y1 = y;
             if edge == Edge::EdgeX1 {
-                y2 = y2 / F::two();
+                y2 = y2 / _2;
             }
             edge = Edge::EdgeX1;
         } else if y * y2 > F::zero() {
             x2 = x;
             y2 = y;
             if edge == Edge::EdgeX2 {
-                y1 = y1 / F::two();
+                y1 = y1 / _2;
             }
             edge = Edge::EdgeX2;
         } else {
