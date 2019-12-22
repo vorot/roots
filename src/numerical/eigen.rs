@@ -711,4 +711,21 @@ mod test {
         assert_eq!(roots[1], 1.5f64);
         assert_eq!(roots[2], 1706332276816893f64);
     }
+
+    #[test]
+    fn test_find_roots_eigen_tim_lueke() {
+        // Try to find roots of the normalized quartic polynomial where the discriminant must be 0
+        // (as reported by Tim Lueke in December 2019)
+        let roots = dbg!(find_roots_eigen(vec![
+            -3.75f64 / -14.0625f64,
+            29.75f64 / -14.0625f64,
+            4.0f64 / -14.0625f64,
+            -16.0f64 / -14.0625f64,
+        ]));
+        // (According to Wolfram Alpha, roots must be -1.1016116464173349f64, 0.9682783130840016f64)
+        // This means that this function cannot handle such small discriminant.
+        // But at least it finds the right number of them.
+        assert_eq!(roots[0], 0.9990584398692597f64);
+        assert_eq!(roots[1], 0.12511486301943303f64);
+    }
 }
