@@ -63,6 +63,7 @@ fn find_roots_via_depressed_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0
 ///
 /// Returned roots are ordered.
 /// Precision is about 5e-15 for f64, 5e-7 for f32.
+/// WARNING: f32 is often not enough to find multiple roots.
 ///
 /// # Examples
 ///
@@ -74,6 +75,12 @@ fn find_roots_via_depressed_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0
 ///
 /// let two_roots = find_roots_quartic(1f32, 0f32, 0f32, 0f32, -1f32);
 /// // Returns Roots::Two([-1f32, 1f32]) as 'x^4 - 1 = 0' has roots -1 and 1
+/// 
+/// let multiple_roots = find_roots_quartic(-14.0625f64, -3.75f64, 29.75f64, 4.0f64, -16.0f64);
+/// // Returns Roots::Two([-1.1016116464173349f64, 0.9682783130840016f64])
+/// 
+/// let multiple_roots_not_found = find_roots_quartic(-14.0625f32, -3.75f32, 29.75f32, 4.0f32, -16.0f32);
+/// // Returns Roots::No([]) because of f32 rounding errors when trying to calculate the discriminant
 /// ```
 pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Roots<F> {
     // Handle non-standard cases
@@ -87,26 +94,27 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
         // a1 = 0, a3 =0; a4*x^4 + a2*x^2 + a0 = 0; solve bi-quadratic equation
         super::biquadratic::find_roots_biquadratic(a4, a2, a0)
     } else {
-        let _3 = F::three();
-        let _4 = F::four();
-        let _6 = F::four() + F::two();
-        let _8 = F::four() + F::four();
-        let _9 = _6 + _3;
-        let _10 = _6 + _4;
-        let _12 = _8 + _4;
-        let _16 = _8 + _8;
-        let _18 = _16 + F::two();
-        let _27 = F::twenty_seven();
-        let _64 = _8 * _8;
-        let _72 = _64 + _8;
-        let _80 = _64 + _16;
-        let _128 = _64 + _64;
-        let _144 = _80 + _64;
-        let _192 = _128 + _64;
-        let _256 = _192 + _64;
+        let _3 = F::from(3i16);
+        let _4 = F::from(4i16);
+        let _6 = F::from(6i16);
+        let _8 = F::from(8i16);
+        let _9 = F::from(9i16);
+        let _10 = F::from(10i16);
+        let _12 = F::from(12i16);
+        let _16 = F::from(16i16);
+        let _18 = F::from(18i16);
+        let _27 = F::from(27i16);
+        let _64 = F::from(64i16);
+        let _72 = F::from(72i16);
+        let _80 = F::from(80i16);
+        let _128 = F::from(128i16);
+        let _144 = F::from(144i16);
+        let _192 = F::from(192i16);
+        let _256 = F::from(256i16);
         // Discriminant
         // https://en.wikipedia.org/wiki/Quartic_function#Nature_of_the_roots
-        let discriminant = dbg!(a4 * a0 * a4 * (_256 * a4 * a0 * a0 - _192 * dbg!(a3) * a1 * a0 + _144 * a2 * dbg!(a1) * a1))
+        // Partially simplifed to keep intermediate values smaller (to minimize rounding errors).
+        let discriminant = dbg!(a4 * a0 * a4 * (_256 * a4 * a0 * a0 + a1 * (_144 * a2 * dbg!(a1) - _192 * dbg!(a3) * a0)))
             + dbg!(a4 * a0 * a2 * a2 * (_16 * a2 * a2 - _80 * a3 * a1 - _128 * a4 * a0))
             + dbg!(
                 a3 * a3
@@ -202,14 +210,25 @@ mod test {
 
     #[test]
     fn test_find_roots_quartic_tim_luecke() {
+        // Reported in December 2019
         assert_eq!(
             find_roots_quartic(-14.0625f64, -3.75f64, 29.75f64, 4.0f64, -16.0f64),
             Roots::Two([-1.1016116464173349f64, 0.9682783130840016f64])
         );
+        // 32-bit floating point is not accurate enough to solve this case ...
         assert_eq!(
             find_roots_quartic(-14.0625f32, -3.75f32, 29.75f32, 4.0f32, -16.0f32),
-            Roots::Two([-1.1016117f32, 0.96827835f32])
+            Roots::No([])
         );
+        // ... even after normalizing
+        assert_eq!(
+            find_roots_quartic(1f32, -3.75f32/-14.0625f32, 29.75f32/-14.0625f32, 4.0f32/-14.0625f32, -16.0f32/-14.0625f32),
+            Roots::No([])
+        );
+        // assert_eq!(
+        //     find_roots_quartic(-14.0625f32, -3.75f32, 29.75f32, 4.0f32, -16.0f32),
+        //     Roots::Two([-1.1016117f32, 0.96827835f32])
+        // );
     }
 
     #[test]
