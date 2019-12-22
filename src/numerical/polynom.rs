@@ -25,7 +25,6 @@
 use super::super::find_roots_cubic;
 use super::super::find_roots_linear;
 use super::super::find_roots_quadratic;
-use super::super::find_roots_quartic;
 use super::super::FloatType;
 use super::Convergency;
 use super::Interval;
@@ -47,7 +46,7 @@ where
 {
     fn value(&self, x: &F) -> F;
     fn value_and_derivative(&self, x: &F) -> ValueAndDerivative<F>;
-    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut Convergency<F>) -> Result<F, SearchError>;
+    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>;
     fn derivative_polynom(&self) -> Vec<F>;
     fn to_string(&self) -> String;
 }
@@ -94,7 +93,7 @@ where
         }
     }
 
-    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut Convergency<F>) -> Result<F, SearchError> {
+    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError> {
         if bracketed_start.is_bracketed() {
             let interval = bracketed_start;
             let mut iter = 0;
@@ -209,7 +208,7 @@ fn initial_bracket<F>(
     direction: &BracketingDirection,
     polynom: &[F],
     derivative_polynom: &[F],
-    convergency: &mut Convergency<F>,
+    convergency: &mut dyn Convergency<F>,
 ) -> Result<Interval<F>, SearchError>
 where
     F: FloatType,
@@ -275,7 +274,7 @@ fn narrow_down<F>(
     initial_interval: &SearchInterval<F>,
     polynom: &[F],
     derivative_polynom: &[F],
-    convergency: &mut Convergency<F>,
+    convergency: &mut dyn Convergency<F>,
 ) -> Result<Interval<F>, SearchError>
 where
     F: FloatType,
@@ -355,7 +354,7 @@ where
 fn find_root_intervals<F>(
     polynom: &[F],
     derivative_polynom: &[F],
-    convergency: &mut Convergency<F>,
+    convergency: &mut dyn Convergency<F>,
 ) -> Result<Vec<SearchInterval<F>>, SearchError>
 where
     F: FloatType,
@@ -439,7 +438,7 @@ where
 ///             .collect();
 /// // Returns vector of roots filterin out all search errors;
 /// ```
-pub fn find_roots_sturm<F>(a: &[F], convergency: &mut Convergency<F>) -> Vec<Result<F, SearchError>>
+pub fn find_roots_sturm<F>(a: &[F], convergency: &mut dyn Convergency<F>) -> Vec<Result<F, SearchError>>
 where
     F: FloatType,
 {
@@ -557,7 +556,12 @@ mod test {
         // Try to find roots of the normalized quartic polynomial where the discriminant must be 0
         // (as reported by Tim Lueke in December 2019)
         // -14.0625*x^4-3.75*x^3+29.75*x^2+4.0*x^1-16.0*x^0 => {-1.1016116464173349, 0.9682783130840016}
-        let polynom = [-3.75f64/-14.0625f64, 29.75f64/-14.0625f64, 4.0f64/-14.0625f64, -16.0f64/-14.0625f64];
+        let polynom = [
+            -3.75f64 / -14.0625f64,
+            29.75f64 / -14.0625f64,
+            4.0f64 / -14.0625f64,
+            -16.0f64 / -14.0625f64,
+        ];
         let roots: Vec<_> = find_roots_sturm(&polynom, &mut 1e-8f64)
             .iter()
             .filter_map(|s| match s {
@@ -565,9 +569,9 @@ mod test {
                 &Err(_) => None,
             })
             .collect();
-            
-            // these roots cannot be found 
-            assert_float_array_eq!(1e-5, roots, []);
-            //assert_float_array_eq!(1e-5, roots, [-1.1016116464173349f64, 0.9682783130840016f64]);
-        }
+
+        // these roots cannot be found
+        assert_float_array_eq!(1e-5, roots, []);
+        //assert_float_array_eq!(1e-5, roots, [-1.1016116464173349f64, 0.9682783130840016f64]);
+    }
 }

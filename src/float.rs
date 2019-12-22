@@ -46,15 +46,10 @@ pub trait FloatType:
     + Mul<Output = Self>
     + Div<Output = Self>
 {
-    #[inline]
     fn zero() -> Self;
-    #[inline]
     fn one() -> Self;
-    #[inline]
     fn one_third() -> Self;
-    #[inline]
     fn pi() -> Self;
-    #[inline]
     fn two_third_pi() -> Self;
     fn sqrt(self) -> Self;
     /// The cubic root function is pow(x, 1/3) accepting negative arguments

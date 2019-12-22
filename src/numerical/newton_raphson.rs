@@ -65,7 +65,7 @@ pub fn find_root_newton_raphson<F, Func, Deriv>(
     start: F,
     f: Func,
     d: Deriv,
-    convergency: &mut Convergency<F>,
+    convergency: &mut dyn Convergency<F>,
 ) -> Result<F, SearchError>
 where
     F: FloatType,
