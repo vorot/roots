@@ -22,10 +22,9 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#[macro_use]
-extern crate bencher;
+extern crate criterion;
 extern crate roots;
-use self::bencher::Bencher;
+use criterion::{criterion_group, criterion_main, Criterion};
 use roots::find_root_brent;
 use roots::find_root_newton_raphson;
 use roots::find_root_regula_falsi;
@@ -50,99 +49,51 @@ fn x4_min_1_derivative(x: f64) -> f64 {
     4f64 * x * x * x
 }
 
-fn secant_x2_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_secant(0f64, 10f64, &x2_min_1, &mut 1e-15f64).ok().unwrap();
-        }
-    });
+fn secant_x2_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_secant(0f64, 10f64, &x2_min_1, &mut 1e-15f64)));
 }
 
-fn secant_x4_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_secant(0f64, 10f64, &x4_min_1, &mut 1e-15f64).ok().unwrap();
-        }
-    });
+fn secant_x4_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_secant(0f64, 10f64, &x4_min_1, &mut 1e-15f64)));
 }
 
-fn regula_falsi_x2_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_regula_falsi(0f64, 10f64, &x2_min_1, &mut 1e-15f64).ok().unwrap();
-        }
-    });
+fn regula_falsi_x2_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_regula_falsi(0f64, 10f64, &x2_min_1, &mut 1e-15f64)));
 }
 
-fn regula_falsi_x4_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_regula_falsi(0f64, 10f64, &x4_min_1, &mut 1e-15f64).ok().unwrap();
-        }
-    });
+fn regula_falsi_x4_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_regula_falsi(0f64, 10f64, &x4_min_1, &mut 1e-15f64)));
 }
 
-fn brent_x2_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_brent(0f64, 10f64, &x2_min_1, &mut 1e-15f64).ok().unwrap();
-        }
-    });
+fn brent_x2_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_brent(0f64, 10f64, &x2_min_1, &mut 1e-15f64)));
 }
 
-fn brent_x4_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_brent(0f64, 10f64, &x4_min_1, &mut 1e-15f64).ok().unwrap();
-        }
-    });
+fn brent_x4_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_brent(0f64, 10f64, &x4_min_1, &mut 1e-15f64)));
 }
 
-fn newton_raphson_x2_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_newton_raphson(0.5f64, &x2_min_1, &x2_min_1_derivative, &mut 1e-15f64)
-                .ok()
-                .unwrap();
-        }
-    });
+fn newton_raphson_x2_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_newton_raphson(0.5f64, &x2_min_1, &x2_min_1_derivative, &mut 1e-15f64)));
 }
 
-fn newton_raphson_x4_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_root_newton_raphson(0.5f64, &x4_min_1, &x4_min_1_derivative, &mut 1e-15f64)
-                .ok()
-                .unwrap();
-        }
-    });
+fn newton_raphson_x4_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_root_newton_raphson(0.5f64, &x4_min_1, &x4_min_1_derivative, &mut 1e-15f64)));
 }
 
-fn quadratic_x2_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_roots_quadratic(1f64, 0f64, -1f64);
-        }
-    });
+fn quadratic_x2_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_roots_quadratic(1f64, 0f64, -1f64)));
 }
 
-fn biquadratic_x4_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_roots_biquadratic(1f64, 0f64, -1f64);
-        }
-    });
+fn biquadratic_x4_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_roots_biquadratic(1f64, 0f64, -1f64)));
 }
 
-fn quartic_x4_min_1_x1000(b: &mut Bencher) {
-    b.iter(|| {
-        for _x in 0..1000 {
-            let _y = find_roots_quartic(1f64, 0f64, 0f64, 0f64, -1f64);
-        }
-    });
+fn quartic_x4_min_1_x1000(c: &mut Criterion) {
+    c.bench_function("simple", |b| b.iter(|| find_roots_quartic(1f64, 0f64, 0f64, 0f64, -1f64)));
 }
 
-benchmark_group!(
+criterion_group!(
     benches,
     quadratic_x2_min_1_x1000,
     biquadratic_x4_min_1_x1000,
@@ -156,4 +107,5 @@ benchmark_group!(
     newton_raphson_x2_min_1_x1000,
     newton_raphson_x4_min_1_x1000
 );
-benchmark_main!(benches);
+
+criterion_main!(benches);
