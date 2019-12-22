@@ -90,7 +90,7 @@ where
 /// let root2 = find_root_inverse_quadratic(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_inverse_quadratic<F, Func>(a: F, b: F, f: Func, convergency: &mut Convergency<F>) -> Result<F, SearchError>
+pub fn find_root_inverse_quadratic<F, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>
 where
     F: FloatType,
     Func: Fn(F) -> F,
@@ -125,7 +125,11 @@ where
     // Iterate quadratically
     let mut iter = 0;
     loop {
-        let parabola = dbg!(Parabola::from_three_points(dbg!(&interval.begin), dbg!(&interval.end), dbg!(&sample3)));
+        let parabola = dbg!(Parabola::from_three_points(
+            dbg!(&interval.begin),
+            dbg!(&interval.end),
+            dbg!(&sample3)
+        ));
 
         // Find the new approximation quadratically
         x3 = if let Some(root) = find_roots_quadratic(parabola.a, parabola.b, parabola.c)

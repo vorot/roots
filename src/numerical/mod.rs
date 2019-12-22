@@ -66,7 +66,7 @@ where
     fn is_bracketed(&self) -> bool {
         self.begin.is_bracketed_with(&self.end)
     }
-    fn is_converged(&self, convergency: &mut Convergency<F>) -> bool {
+    fn is_converged(&self, convergency: &mut dyn Convergency<F>) -> bool {
         convergency.is_converged(self.begin.x, self.end.x)
     }
     /// Check if the given X is inside the interval
@@ -254,5 +254,4 @@ mod test {
         assert_eq!(0.5f64, sut1.middle());
         assert_eq!(0f64, sut2.middle());
     }
-
 }
