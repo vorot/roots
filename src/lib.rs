@@ -95,3 +95,4 @@ pub use self::numerical::simple_convergency::SimpleConvergency;
 pub use self::numerical::Convergency;
 pub use self::numerical::Interval;
 pub use self::numerical::Sample;
+pub use self::numerical::SearchError;
