@@ -206,7 +206,7 @@ mod test {
             Err(SearchError::NoBracketing)
         );
         let result = find_root_inverse_quadratic(10f64, 20f64, &f, &mut conv);
-        assert_eq!(result.unwrap_err().description(), "Initial values do not bracket zero");
+        assert_eq!(result.unwrap_err().to_string(), "Bracketing Error");
         assert_eq!(0, conv.get_iter_count());
     }
 
