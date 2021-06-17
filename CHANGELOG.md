@@ -4,6 +4,9 @@ This project is going to adhere to [Semantic Versioning](http://semver.org/)
 after version 1.0.0.
 
 ## [Unreleased]
+
+## [0.0.7] - 2021-06-17
+* SearchError becomes public - thanks to JP-Ellis
 * Unnormalized cubic equations are solved using the general formula rather than trigonometrically - thanks to Logicalshift
 
 ## [0.0.6] - 2019-12-22
@@ -34,7 +37,8 @@ after version 1.0.0.
 ## [0.0.1] - 2015-03-24
 * Initial version
 
-[Unreleased]: https://github.com/vorot/roots/compare/v0.0.6...HEAD
+[Unreleased]: https://github.com/vorot/roots/compare/v0.0.7...HEAD
+[0.0.7]: https://github.com/vorot/roots/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/vorot/roots/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/vorot/roots/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/vorot/roots/compare/v0.0.3...v0.0.4
