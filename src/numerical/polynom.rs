@@ -28,9 +28,9 @@ use super::super::find_roots_quadratic;
 use super::super::FloatType;
 use super::Convergency;
 use super::Interval;
-use super::SearchInterval;
 use super::Sample;
 use super::SearchError;
+use super::SearchInterval;
 
 #[derive(Debug, PartialEq)]
 struct ValueAndDerivative<F>
@@ -41,7 +41,7 @@ where
     derivative: F,
 }
 
-trait Polynom<F:FloatType>
+trait Polynom<F: FloatType>
 where
     F: FloatType,
 {
@@ -189,7 +189,7 @@ enum BracketingDirection {
     TowardsNegative,
 }
 
-fn initial_bracket<F:FloatType>(
+fn initial_bracket<F: FloatType>(
     initial_sample: &Sample<F>,
     direction: &BracketingDirection,
     polynom: &[F],
@@ -256,7 +256,7 @@ where
     result
 }
 
-fn narrow_down<F:FloatType>(
+fn narrow_down<F: FloatType>(
     initial_interval: &SearchInterval<F>,
     polynom: &[F],
     derivative_polynom: &[F],
@@ -337,7 +337,7 @@ where
     }
 }
 
-fn find_root_intervals<F:FloatType>(
+fn find_root_intervals<F: FloatType>(
     polynom: &[F],
     derivative_polynom: &[F],
     convergency: &mut dyn Convergency<F>,
@@ -424,7 +424,7 @@ where
 ///             .collect();
 /// // Returns vector of roots filterin out all search errors;
 /// ```
-pub fn find_roots_sturm<F:FloatType>(a: &[F], convergency: &mut dyn Convergency<F>) -> Vec<Result<F, SearchError<F>>>
+pub fn find_roots_sturm<F: FloatType>(a: &[F], convergency: &mut dyn Convergency<F>) -> Vec<Result<F, SearchError<F>>>
 where
     F: FloatType,
 {

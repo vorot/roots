@@ -75,10 +75,10 @@ fn find_roots_via_depressed_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0
 ///
 /// let two_roots = find_roots_quartic(1f32, 0f32, 0f32, 0f32, -1f32);
 /// // Returns Roots::Two([-1f32, 1f32]) as 'x^4 - 1 = 0' has roots -1 and 1
-/// 
+///
 /// let multiple_roots = find_roots_quartic(-14.0625f64, -3.75f64, 29.75f64, 4.0f64, -16.0f64);
 /// // Returns Roots::Two([-1.1016116464173349f64, 0.9682783130840016f64])
-/// 
+///
 /// let multiple_roots_not_found = find_roots_quartic(-14.0625f32, -3.75f32, 29.75f32, 4.0f32, -16.0f32);
 /// // Returns Roots::No([]) because of f32 rounding errors when trying to calculate the discriminant
 /// ```
@@ -222,7 +222,13 @@ mod test {
         );
         // ... even after normalizing
         assert_eq!(
-            find_roots_quartic(1f32, -3.75f32/-14.0625f32, 29.75f32/-14.0625f32, 4.0f32/-14.0625f32, -16.0f32/-14.0625f32),
+            find_roots_quartic(
+                1f32,
+                -3.75f32 / -14.0625f32,
+                29.75f32 / -14.0625f32,
+                4.0f32 / -14.0625f32,
+                -16.0f32 / -14.0625f32
+            ),
             Roots::No([])
         );
         // assert_eq!(

@@ -24,9 +24,9 @@
 
 use super::super::FloatType;
 use super::Convergency;
-use super::SearchError;
-use super::Sample;
 use super::Interval;
+use super::Sample;
+use super::SearchError;
 use super::SearchInterval;
 
 /// Illinois modification to the classical method
@@ -73,7 +73,12 @@ enum Edge {
 /// let root2 = find_root_regula_falsi(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_regula_falsi<F:FloatType, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>>
+pub fn find_root_regula_falsi<F: FloatType, Func>(
+    a: F,
+    b: F,
+    f: Func,
+    convergency: &mut dyn Convergency<F>,
+) -> Result<F, SearchError<F>>
 where
     F: FloatType,
     Func: Fn(F) -> F,
@@ -89,7 +94,10 @@ where
         return Ok(x2);
     }
     if y1 * y2 > F::zero() {
-        return Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:Sample{x:x1,y:y1},end:Sample{x:x2,y:y2}})));
+        return Err(SearchError::NoBracketing(SearchInterval::Middle(Interval {
+            begin: Sample { x: x1, y: y1 },
+            end: Sample { x: x2, y: y2 },
+        })));
     }
     let mut edge = Edge::NoEdge;
     let mut iter = 0;
@@ -123,7 +131,7 @@ where
 
         iter = iter + 1;
         if convergency.is_iteration_limit_reached(iter) {
-            return Err(SearchError::NoConvergency(Sample{x:x,y:y}));
+            return Err(SearchError::NoConvergency(Sample { x: x, y: y }));
         }
     }
 }
@@ -157,10 +165,16 @@ mod test {
         conv.reset();
         assert_eq!(
             find_root_regula_falsi(10f64, 20f64, &f, &mut conv),
-            Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:Sample{x:10f64,y:99f64},end:Sample{x:20f64,y:399f64}})))
+            Err(SearchError::NoBracketing(SearchInterval::Middle(Interval {
+                begin: Sample { x: 10f64, y: 99f64 },
+                end: Sample { x: 20f64, y: 399f64 }
+            })))
         );
         let result = find_root_regula_falsi(10f64, 20f64, &f, &mut conv);
-        assert_eq!(result.unwrap_err().to_string(), "Bracketing Error, interval:Middle(Interval { begin: Sample { x: 10.0, y: 99.0 }, end: Sample { x: 20.0, y: 399.0 } })");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Bracketing Error, interval:Middle(Interval { begin: Sample { x: 10.0, y: 99.0 }, end: Sample { x: 20.0, y: 399.0 } })"
+        );
         assert_eq!(0, conv.get_iter_count());
     }
 }

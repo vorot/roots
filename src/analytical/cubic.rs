@@ -76,9 +76,8 @@ pub fn find_roots_cubic<F: FloatType>(a3: F, a2: F, a1: F, a0: F) -> Roots<F> {
         let _27 = F::from(27i16);
 
         // standard case
-        let d = _18 * a3 * a2 * a1 * a0 - _4 * a2 * a2 * a2 * a0 + a2 * a2 * a1 * a1
-            - _4 * a3 * a1 * a1 * a1
-            - _27 * a3 * a3 * a0 * a0;
+        let d =
+            _18 * a3 * a2 * a1 * a0 - _4 * a2 * a2 * a2 * a0 + a2 * a2 * a1 * a1 - _4 * a3 * a1 * a1 * a1 - _27 * a3 * a3 * a0 * a0;
         let d0 = a2 * a2 - _3 * a3 * a1;
         let d1 = _2 * a2 * a2 * a2 - _9 * a3 * a2 * a1 + _27 * a3 * a3 * a0;
         if d < F::zero() {

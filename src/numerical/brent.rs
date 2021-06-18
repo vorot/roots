@@ -10,9 +10,9 @@
 
 use super::super::FloatType;
 use super::Convergency;
-use super::SearchError;
-use super::Sample;
 use super::Interval;
+use super::Sample;
+use super::SearchError;
 use super::SearchInterval;
 
 /// Arrange two points so that the greatest value is first
@@ -57,14 +57,17 @@ fn arrange<F: FloatType>(a: F, ya: F, b: F, yb: F) -> (F, F, F, F) {
 /// let root2 = find_root_brent(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_brent<F:FloatType, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>>
+pub fn find_root_brent<F: FloatType, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>>
 where
     F: FloatType,
     Func: Fn(F) -> F,
 {
     let (mut a, mut ya, mut b, mut yb) = arrange(a, f(a), b, f(b));
     if ya * yb > F::zero() {
-        return Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:Sample{x:a,y:ya},end:Sample{x:b,y:yb}})) );
+        return Err(SearchError::NoBracketing(SearchInterval::Middle(Interval {
+            begin: Sample { x: a, y: ya },
+            end: Sample { x: b, y: yb },
+        })));
     }
 
     let (mut c, mut yc, mut d) = (a, ya, a);
@@ -132,7 +135,7 @@ where
 
         iter = iter + 1;
         if convergency.is_iteration_limit_reached(iter) {
-            return Err(SearchError::NoConvergency(Sample{x:a,y:ya}));
+            return Err(SearchError::NoConvergency(Sample { x: a, y: ya }));
         }
     }
 }
@@ -156,7 +159,13 @@ mod test {
         assert_eq!(10, conv.get_iter_count());
 
         conv.reset();
-        assert_eq!(find_root_brent(10f64, 20f64, &f, &mut conv), Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:Sample{x:20f64,y:399f64},end:Sample{x:10f64,y:99f64}}))));
+        assert_eq!(
+            find_root_brent(10f64, 20f64, &f, &mut conv),
+            Err(SearchError::NoBracketing(SearchInterval::Middle(Interval {
+                begin: Sample { x: 20f64, y: 399f64 },
+                end: Sample { x: 10f64, y: 99f64 }
+            })))
+        );
         assert_eq!(0, conv.get_iter_count());
     }
 
@@ -174,7 +183,10 @@ mod test {
 
         assert_eq!(
             find_root_brent(10f64, 20f64, &f, &mut 1e-15f64),
-            Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:Sample{x:20f64,y:399f64},end:Sample{x:10f64,y:99f64}})))
+            Err(SearchError::NoBracketing(SearchInterval::Middle(Interval {
+                begin: Sample { x: 20f64, y: 399f64 },
+                end: Sample { x: 10f64, y: 99f64 }
+            })))
         );
     }
 }

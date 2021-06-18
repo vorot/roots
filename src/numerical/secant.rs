@@ -24,8 +24,8 @@
 
 use super::super::FloatType;
 use super::Convergency;
-use super::SearchError;
 use super::Sample;
+use super::SearchError;
 
 /// Find a root of the function f(x) = 0 using the secant method.
 ///
@@ -61,7 +61,12 @@ use super::Sample;
 /// let root2 = find_root_secant(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_secant<F:FloatType, Func>(first: F, second: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>>
+pub fn find_root_secant<F: FloatType, Func>(
+    first: F,
+    second: F,
+    f: Func,
+    convergency: &mut dyn Convergency<F>,
+) -> Result<F, SearchError<F>>
 where
     F: FloatType,
     Func: Fn(F) -> F,
@@ -80,7 +85,7 @@ where
     let mut iter = 0;
     loop {
         if convergency.is_root_found(y1 - y2) {
-            return Err(SearchError::ZeroDerivative(Sample{x:x1,y:y1},(y1 - y2)/(x1-x2)));
+            return Err(SearchError::ZeroDerivative(Sample { x: x1, y: y1 }, (y1 - y2) / (x1 - x2)));
         }
         let x = x2 - y2 * (x2 - x1) / (y2 - y1);
         if convergency.is_converged(x, x2) {
@@ -98,7 +103,7 @@ where
 
         iter = iter + 1;
         if convergency.is_iteration_limit_reached(iter) {
-            return Err(SearchError::NoConvergency(Sample{x:x,y:y}));
+            return Err(SearchError::NoConvergency(Sample { x: x, y: y }));
         }
     }
 }
@@ -124,7 +129,7 @@ mod test {
         conv.reset();
         assert_eq!(
             find_root_secant(10f64, -10f64, &f, &mut conv),
-            Err(SearchError::ZeroDerivative(Sample{x:10f64,y:99f64},0f64))
+            Err(SearchError::ZeroDerivative(Sample { x: 10f64, y: 99f64 }, 0f64))
         );
         assert_eq!(0, conv.get_iter_count());
     }

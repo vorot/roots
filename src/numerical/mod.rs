@@ -114,13 +114,13 @@ where
     Middle(Interval<F>),
 }
 
-impl<F:FloatType> fmt::Display for SearchInterval<F> {
+impl<F: FloatType> fmt::Display for SearchInterval<F> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             SearchInterval::Whole => write!(f, "[-∞ .. +∞]"),
-            SearchInterval::First(end) => write!(f, "[-∞ .. {:?}]",end),
-            SearchInterval::Last(begin) => write!(f, "[{:?} .. +∞]",begin),
-            SearchInterval::Middle(interval) => write!(f, "[{:?} .. {:?}]",interval.begin,interval.end),
+            SearchInterval::First(end) => write!(f, "[-∞ .. {:?}]", end),
+            SearchInterval::Last(begin) => write!(f, "[{:?} .. +∞]", begin),
+            SearchInterval::Middle(interval) => write!(f, "[{:?} .. {:?}]", interval.begin, interval.end),
         }
     }
 }
@@ -133,25 +133,25 @@ pub enum SearchError<F: FloatType> {
     /// Initial values do not bracket zero
     NoBracketing(SearchInterval<F>),
     /// The algorithm cannot continue from the point where the derivative is zero
-    ZeroDerivative(Sample<F>,F),
+    ZeroDerivative(Sample<F>, F),
 }
 
-impl<F:FloatType> fmt::Display for SearchError<F> {
+impl<F: FloatType> fmt::Display for SearchError<F> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            SearchError::NoConvergency(last_sample) => write!(f, "Convergency Error, last sample:{:?}",last_sample),
-            SearchError::NoBracketing(interval) => write!(f, "Bracketing Error, interval:{:?}",interval),
-            SearchError::ZeroDerivative(sample,derivative) => write!(f, "Zero Derivative Error, {:?} at {:?}",derivative,sample),
+            SearchError::NoConvergency(last_sample) => write!(f, "Convergency Error, last sample:{:?}", last_sample),
+            SearchError::NoBracketing(interval) => write!(f, "Bracketing Error, interval:{:?}", interval),
+            SearchError::ZeroDerivative(sample, derivative) => write!(f, "Zero Derivative Error, {:?} at {:?}", derivative, sample),
         }
     }
 }
 
-impl<F:FloatType> Error for SearchError<F> {
+impl<F: FloatType> Error for SearchError<F> {
     fn description(&self) -> &str {
         match self {
             SearchError::NoConvergency(_) => "The algorithm could not converge within the given number of iterations",
             SearchError::NoBracketing(_) => "Initial values do not bracket zero",
-            SearchError::ZeroDerivative(_,_) => "The algorithm cannot continue from the point where the derivative is zero",
+            SearchError::ZeroDerivative(_, _) => "The algorithm cannot continue from the point where the derivative is zero",
         }
     }
 }

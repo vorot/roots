@@ -24,8 +24,8 @@
 
 use super::super::FloatType;
 use super::Convergency;
-use super::SearchError;
 use super::Sample;
+use super::SearchError;
 
 /// Find a root of the function f(x) = 0 using the Newton-Raphson method.
 ///
@@ -62,7 +62,7 @@ use super::Sample;
 /// let root2 = find_root_newton_raphson(-10f64, &f, &d, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_newton_raphson<F:FloatType, Func, Deriv>(
+pub fn find_root_newton_raphson<F: FloatType, Func, Deriv>(
     start: F,
     f: Func,
     d: Deriv,
@@ -89,7 +89,7 @@ where
                 iter = iter + 1;
                 continue;
             } else {
-                return Err(SearchError::ZeroDerivative(Sample{x:x,y:f},d));
+                return Err(SearchError::ZeroDerivative(Sample { x: x, y: f }, d));
             }
         }
 
@@ -102,7 +102,7 @@ where
         iter = iter + 1;
 
         if convergency.is_iteration_limit_reached(iter) {
-            return Err(SearchError::NoConvergency(Sample{x:x,y:f}));
+            return Err(SearchError::NoConvergency(Sample { x: x, y: f }));
         }
     }
 }
