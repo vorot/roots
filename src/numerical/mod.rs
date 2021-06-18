@@ -27,7 +27,7 @@ use std::error::Error;
 use std::fmt;
 
 /// Pair of the independent variable x and the function value y=F(x)
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Sample<F>
 where
     F: FloatType,
@@ -48,7 +48,7 @@ where
 }
 
 /// Interval between two samples, including these samples
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Interval<F>
 where
     F: FloatType,
@@ -98,32 +98,60 @@ where
     }
 }
 
-/// Possible errors
+/// Interval for searching roots
 #[derive(Debug, PartialEq)]
-pub enum SearchError {
-    /// The algorithm could not converge within the given number of iterations
-    NoConvergency,
-    /// Initial values do not bracket zero
-    NoBracketing,
-    /// The algorithm cannot continue from the point where the derivative is zero
-    ZeroDerivative,
+pub enum SearchInterval<F>
+where
+    F: FloatType,
+{
+    /// [-infinity .. +infinity]
+    Whole,
+    /// [-infinity .. x]
+    First(Sample<F>),
+    /// [x .. +infinity ]
+    Last(Sample<F>),
+    /// [x1 .. x2 ]
+    Middle(Interval<F>),
 }
 
-impl fmt::Display for SearchError {
+impl<F:FloatType> fmt::Display for SearchInterval<F> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            SearchError::NoConvergency => write!(f, "Convergency Error"),
-            SearchError::NoBracketing => write!(f, "Bracketing Error"),
-            SearchError::ZeroDerivative => write!(f, "Zero Derivative Error"),
+            SearchInterval::Whole => write!(f, "[-∞ .. +∞]"),
+            SearchInterval::First(end) => write!(f, "[-∞ .. {:?}]",end),
+            SearchInterval::Last(begin) => write!(f, "[{:?} .. +∞]",begin),
+            SearchInterval::Middle(interval) => write!(f, "[{:?} .. {:?}]",interval.begin,interval.end),
         }
     }
 }
-impl Error for SearchError {
+
+/// Possible errors
+#[derive(Debug, PartialEq)]
+pub enum SearchError<F: FloatType> {
+    /// The algorithm could not converge within the given number of iterations
+    NoConvergency(Sample<F>),
+    /// Initial values do not bracket zero
+    NoBracketing(SearchInterval<F>),
+    /// The algorithm cannot continue from the point where the derivative is zero
+    ZeroDerivative(Sample<F>,F),
+}
+
+impl<F:FloatType> fmt::Display for SearchError<F> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            SearchError::NoConvergency(last_sample) => write!(f, "Convergency Error, last sample:{:?}",last_sample),
+            SearchError::NoBracketing(interval) => write!(f, "Bracketing Error, interval:{:?}",interval),
+            SearchError::ZeroDerivative(sample,derivative) => write!(f, "Zero Derivative Error, {:?} at {:?}",derivative,sample),
+        }
+    }
+}
+
+impl<F:FloatType> Error for SearchError<F> {
     fn description(&self) -> &str {
         match self {
-            SearchError::NoConvergency => "The algorithm could not converge within the given number of iterations",
-            SearchError::NoBracketing => "Initial values do not bracket zero",
-            SearchError::ZeroDerivative => "The algorithm cannot continue from the point where the derivative is zero",
+            SearchError::NoConvergency(_) => "The algorithm could not converge within the given number of iterations",
+            SearchError::NoBracketing(_) => "Initial values do not bracket zero",
+            SearchError::ZeroDerivative(_,_) => "The algorithm cannot continue from the point where the derivative is zero",
         }
     }
 }

@@ -28,6 +28,7 @@ use super::Convergency;
 use super::Interval;
 use super::Sample;
 use super::SearchError;
+use super::SearchInterval;
 
 /// Definition of the quadratic equation a*x^2 + b*x + c
 #[derive(Debug, PartialEq)]
@@ -90,7 +91,7 @@ where
 /// let root2 = find_root_inverse_quadratic(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_inverse_quadratic<F, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>
+pub fn find_root_inverse_quadratic<F:FloatType, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>>
 where
     F: FloatType,
     Func: Fn(F) -> F,
@@ -105,7 +106,7 @@ where
         return Ok(sample2.x);
     }
     if !sample1.is_bracketed_with(&sample2) {
-        return Err(SearchError::NoBracketing);
+        return Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:sample1,end:sample2})));
     }
 
     // Initially, find x3 using the regula falsi method
@@ -169,7 +170,7 @@ where
 
         iter = iter + 1;
         if convergency.is_iteration_limit_reached(iter) {
-            return Err(SearchError::NoConvergency);
+            return Err(SearchError::NoConvergency(sample3));
         }
     }
 }
@@ -203,10 +204,10 @@ mod test {
         conv.reset();
         assert_eq!(
             find_root_inverse_quadratic(10f64, 20f64, &f, &mut conv),
-            Err(SearchError::NoBracketing)
+            Err(SearchError::NoBracketing(SearchInterval::Middle(Interval{begin:Sample{x:10f64,y:99f64},end:Sample{x:20f64,y:399f64}})))
         );
         let result = find_root_inverse_quadratic(10f64, 20f64, &f, &mut conv);
-        assert_eq!(result.unwrap_err().to_string(), "Bracketing Error");
+        assert_eq!(result.unwrap_err().to_string(), "Bracketing Error, interval:Middle(Interval { begin: Sample { x: 10.0, y: 99.0 }, end: Sample { x: 20.0, y: 399.0 } })");
         assert_eq!(0, conv.get_iter_count());
     }
 

@@ -28,6 +28,7 @@ use super::super::find_roots_quadratic;
 use super::super::FloatType;
 use super::Convergency;
 use super::Interval;
+use super::SearchInterval;
 use super::Sample;
 use super::SearchError;
 
@@ -40,13 +41,13 @@ where
     derivative: F,
 }
 
-trait Polynom<F>
+trait Polynom<F:FloatType>
 where
     F: FloatType,
 {
     fn value(&self, x: &F) -> F;
     fn value_and_derivative(&self, x: &F) -> ValueAndDerivative<F>;
-    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>;
+    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>>;
     fn derivative_polynom(&self) -> Vec<F>;
     fn to_string(&self) -> String;
 }
@@ -93,7 +94,7 @@ where
         }
     }
 
-    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError> {
+    fn find_root(&self, bracketed_start: &mut Interval<F>, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError<F>> {
         if bracketed_start.is_bracketed() {
             let interval = bracketed_start;
             let mut iter = 0;
@@ -138,11 +139,11 @@ where
                 }
                 iter = iter + 1;
                 if convergency.is_iteration_limit_reached(iter) {
-                    break Err(SearchError::NoConvergency);
+                    break Err(SearchError::NoConvergency(interval.begin));
                 }
             }
         } else {
-            Err(SearchError::NoBracketing)
+            Err(SearchError::NoBracketing(SearchInterval::Middle(*bracketed_start)))
         }
     }
 
@@ -183,33 +184,18 @@ where
     }
 }
 
-/// Interval for searching roots
-enum SearchInterval<F>
-where
-    F: FloatType,
-{
-    /// [-infinity .. +infinity]
-    Whole,
-    /// [-infinity .. x]
-    First(Sample<F>),
-    /// [x .. +infinity ]
-    Last(Sample<F>),
-    /// [x1 .. x2 ]
-    Middle(Interval<F>),
-}
-
 enum BracketingDirection {
     TowardsPositive,
     TowardsNegative,
 }
 
-fn initial_bracket<F>(
+fn initial_bracket<F:FloatType>(
     initial_sample: &Sample<F>,
     direction: &BracketingDirection,
     polynom: &[F],
     derivative_polynom: &[F],
     convergency: &mut dyn Convergency<F>,
-) -> Result<Interval<F>, SearchError>
+) -> Result<Interval<F>, SearchError<F>>
 where
     F: FloatType,
 {
@@ -263,19 +249,19 @@ where
             next_x = next_x + step;
             iter = iter + 1;
             if convergency.is_iteration_limit_reached(iter) {
-                break Err(SearchError::NoConvergency);
+                break Err(SearchError::NoConvergency(next_sample));
             };
         }
     };
     result
 }
 
-fn narrow_down<F>(
+fn narrow_down<F:FloatType>(
     initial_interval: &SearchInterval<F>,
     polynom: &[F],
     derivative_polynom: &[F],
     convergency: &mut dyn Convergency<F>,
-) -> Result<Interval<F>, SearchError>
+) -> Result<Interval<F>, SearchError<F>>
 where
     F: FloatType,
 {
@@ -345,17 +331,17 @@ where
                     })
                 }
             } else {
-                Err(SearchError::NoBracketing)
+                Err(SearchError::NoBracketing(SearchInterval::Middle(*interval)))
             }
         }
     }
 }
 
-fn find_root_intervals<F>(
+fn find_root_intervals<F:FloatType>(
     polynom: &[F],
     derivative_polynom: &[F],
     convergency: &mut dyn Convergency<F>,
-) -> Result<Vec<SearchInterval<F>>, SearchError>
+) -> Result<Vec<SearchInterval<F>>, SearchError<F>>
 where
     F: FloatType,
 {
@@ -411,7 +397,7 @@ where
             }
             Ok(result)
         }
-        _ => Err(SearchError::NoBracketing),
+        _ => Err(SearchError::NoBracketing(previous_interval)),
     }
 }
 
@@ -438,7 +424,7 @@ where
 ///             .collect();
 /// // Returns vector of roots filterin out all search errors;
 /// ```
-pub fn find_roots_sturm<F>(a: &[F], convergency: &mut dyn Convergency<F>) -> Vec<Result<F, SearchError>>
+pub fn find_roots_sturm<F:FloatType>(a: &[F], convergency: &mut dyn Convergency<F>) -> Vec<Result<F, SearchError<F>>>
 where
     F: FloatType,
 {
