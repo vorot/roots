@@ -45,16 +45,16 @@ fn find_roots_via_depressed_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0
     let a4_pow_3 = a4_pow_2 * a4;
     let a4_pow_4 = a4_pow_2 * a4_pow_2;
     // Re-use pre-calculated values
-    let p = pp / (_8 * dbg!(a4_pow_2));
-    let q = rr / (_8 * dbg!(a4_pow_3));
-    let r = (dd + _16 * a4_pow_2 * (_12 * a0 * a4 - _3 * a1 * a3 + a2 * a2)) / (_256 * dbg!(a4_pow_4));
+    let p = pp / (_8 * a4_pow_2);
+    let q = rr / (_8 * a4_pow_3);
+    let r = (dd + _16 * a4_pow_2 * (_12 * a0 * a4 - _3 * a1 * a3 + a2 * a2)) / (_256 * a4_pow_4);
 
     let mut roots = Roots::No([]);
-    for y in super::quartic_depressed::find_roots_quartic_depressed(dbg!(p), dbg!(q), dbg!(r))
+    for y in super::quartic_depressed::find_roots_quartic_depressed(p, q, r)
         .as_ref()
         .iter()
     {
-        roots = roots.add_new_root(dbg!(*y) - a3 / (_4 * a4));
+        roots = roots.add_new_root(*y - a3 / (_4 * a4));
     }
     roots
 }
@@ -75,10 +75,10 @@ fn find_roots_via_depressed_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0
 ///
 /// let two_roots = find_roots_quartic(1f32, 0f32, 0f32, 0f32, -1f32);
 /// // Returns Roots::Two([-1f32, 1f32]) as 'x^4 - 1 = 0' has roots -1 and 1
-/// 
+///
 /// let multiple_roots = find_roots_quartic(-14.0625f64, -3.75f64, 29.75f64, 4.0f64, -16.0f64);
 /// // Returns Roots::Two([-1.1016116464173349f64, 0.9682783130840016f64])
-/// 
+///
 /// let multiple_roots_not_found = find_roots_quartic(-14.0625f32, -3.75f32, 29.75f32, 4.0f32, -16.0f32);
 /// // Returns Roots::No([]) because of f32 rounding errors when trying to calculate the discriminant
 /// ```
@@ -114,15 +114,13 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
         // Discriminant
         // https://en.wikipedia.org/wiki/Quartic_function#Nature_of_the_roots
         // Partially simplifed to keep intermediate values smaller (to minimize rounding errors).
-        let discriminant = dbg!(a4 * a0 * a4 * (_256 * a4 * a0 * a0 + a1 * (_144 * a2 * dbg!(a1) - _192 * dbg!(a3) * a0)))
-            + dbg!(a4 * a0 * a2 * a2 * (_16 * a2 * a2 - _80 * a3 * a1 - _128 * a4 * a0))
-            + dbg!(
-                a3 * a3
-                    * (a4 * a0 * (_144 * a2 * a0 - _6 * a1 * a1)
-                        + (a0 * (_18 * a3 * a2 * a1 - _27 * a3 * a3 * a0 - _4 * a2 * a2 * a2)
-                            + a1 * a1 * (a2 * a2 - _4 * a3 * a1)))
-            )
-            + dbg!(a4 * a1 * a1 * (_18 * a3 * a2 * a1 - _27 * a4 * a1 * a1 - _4 * a2 * a2 * a2));
+        let discriminant = a4 * a0 * a4 * (_256 * a4 * a0 * a0 + a1 * (_144 * a2 * a1 - _192 * a3 * a0))
+            + a4 * a0 * a2 * a2 * (_16 * a2 * a2 - _80 * a3 * a1 - _128 * a4 * a0)
+            + (a3
+                * a3
+                * (a4 * a0 * (_144 * a2 * a0 - _6 * a1 * a1)
+                    + (a0 * (_18 * a3 * a2 * a1 - _27 * a3 * a3 * a0 - _4 * a2 * a2 * a2) + a1 * a1 * (a2 * a2 - _4 * a3 * a1))))
+            + a4 * a1 * a1 * (_18 * a3 * a2 * a1 - _27 * a4 * a1 * a1 - _4 * a2 * a2 * a2);
         let pp = _8 * a4 * a2 - _3 * a3 * a3;
         let rr = a3 * a3 * a3 + _8 * a4 * a4 * a1 - _4 * a4 * a3 * a2;
         let delta0 = a2 * a2 - _3 * a3 * a1 + _12 * a4 * a0;
@@ -131,15 +129,15 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
             - _3 * a3 * a3 * a3 * a3;
 
         // Handle special cases
-        let double_root = dbg!(discriminant) == F::zero();
-        if dbg!(double_root) {
-            let triple_root = double_root && dbg!(delta0) == F::zero();
-            let quadruple_root = triple_root && dbg!(dd) == F::zero();
-            let no_roots = dd == F::zero() && dbg!(pp) > F::zero() && dbg!(rr) == F::zero();
-            if dbg!(quadruple_root) {
+        let double_root = discriminant == F::zero();
+        if double_root {
+            let triple_root = double_root && delta0 == F::zero();
+            let quadruple_root = triple_root && dd == F::zero();
+            let no_roots = dd == F::zero() && pp > F::zero() && rr == F::zero();
+            if quadruple_root {
                 // Wiki: all four roots are equal
                 Roots::One([-a3 / (_4 * a4)])
-            } else if dbg!(triple_root) {
+            } else if triple_root {
                 // Wiki: At least three roots are equal to each other
                 // x0 is the unique root of the remainder of the Euclidean division of the quartic by its second derivative
                 //
@@ -156,21 +154,21 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
                 // (−72*a^2*e+10*a*c^2−3*b^2*c)/(9*(8*a^2*d−4*a*b*c+b^3))
                 let x0 = (-_72 * a4 * a4 * a0 + _10 * a4 * a2 * a2 - _3 * a3 * a3 * a2)
                     / (_9 * (_8 * a4 * a4 * a1 - _4 * a4 * a3 * a2 + a3 * a3 * a3));
-                let roots = dbg!(Roots::One([x0]));
-                roots.add_new_root(dbg!(-(a3 / a4 + _3 * x0)))
-            } else if dbg!(no_roots) {
+                let roots = Roots::One([x0]);
+                roots.add_new_root(-(a3 / a4 + _3 * x0))
+            } else if no_roots {
                 // Wiki: two complex conjugate double roots
                 Roots::No([])
             } else {
-                find_roots_via_depressed_quartic(a4, a3, a2, a1, a0, pp, dbg!(rr), dd)
+                find_roots_via_depressed_quartic(a4, a3, a2, a1, a0, pp, rr, dd)
             }
         } else {
-            let no_roots = dbg!(pp) > F::zero() || dbg!(dd) > F::zero();
-            if dbg!(no_roots) {
+            let no_roots = pp > F::zero() || dd > F::zero();
+            if no_roots {
                 // Wiki: two pairs of non-real complex conjugate roots
                 Roots::No([])
             } else {
-                find_roots_via_depressed_quartic(a4, a3, a2, a1, a0, pp, dbg!(rr), dd)
+                find_roots_via_depressed_quartic(a4, a3, a2, a1, a0, pp, rr, dd)
             }
         }
     }
@@ -222,7 +220,13 @@ mod test {
         );
         // ... even after normalizing
         assert_eq!(
-            find_roots_quartic(1f32, -3.75f32/-14.0625f32, 29.75f32/-14.0625f32, 4.0f32/-14.0625f32, -16.0f32/-14.0625f32),
+            find_roots_quartic(
+                1f32,
+                -3.75f32 / -14.0625f32,
+                29.75f32 / -14.0625f32,
+                4.0f32 / -14.0625f32,
+                -16.0f32 / -14.0625f32
+            ),
             Roots::No([])
         );
         // assert_eq!(

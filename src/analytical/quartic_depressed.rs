@@ -60,11 +60,7 @@ pub fn find_roots_quartic_depressed<F: FloatType>(a2: F, a1: F, a0: F) -> Roots<
         let b0 = (a2_pow_2 * a2 - a2 * a0 - a1_div_2 * a1_div_2) / _2;
 
         // At least one root always exists. The last root is the maximal one.
-        let resolvent_roots = dbg!(super::cubic_normalized::find_roots_cubic_normalized(
-            dbg!(b2),
-            dbg!(b1),
-            dbg!(b0)
-        ));
+        let resolvent_roots = super::cubic_normalized::find_roots_cubic_normalized(b2, b1, b0);
         let y = resolvent_roots.as_ref().iter().last().unwrap();
 
         let _a2_plus_2y = a2 + _2 * *y;
