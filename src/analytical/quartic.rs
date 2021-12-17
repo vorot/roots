@@ -163,7 +163,7 @@ pub fn find_roots_quartic<F: FloatType>(a4: F, a3: F, a2: F, a1: F, a0: F) -> Ro
                 find_roots_via_depressed_quartic(a4, a3, a2, a1, a0, pp, rr, dd)
             }
         } else {
-            let no_roots = pp > F::zero() || dd > F::zero();
+            let no_roots = discriminant > F::zero() && (pp > F::zero() || dd > F::zero());
             if no_roots {
                 // Wiki: two pairs of non-real complex conjugate roots
                 Roots::No([])
@@ -186,6 +186,17 @@ mod test {
             find_roots_quartic(1f64, -10f64, 35f64, -50f64, 24f64),
             Roots::Four([1f64, 2f64, 3f64, 4f64])
         );
+
+        match find_roots_quartic(1.1248467624839498f64, -4.8721513473605924f64,
+                                 7.9323705711747614f64, -5.7774307699949397f64,
+                                 1.5971379368787519f64) {
+            Roots::Two(x) => {
+                assert_float_array_eq!(2e-15f64, x, [1.225913506454221f64, 1.257275575390252f64]);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
 
         match find_roots_quartic(3f64, 5f64, -5f64, -5f64, 2f64) {
             Roots::Four(x) => {
