@@ -63,14 +63,14 @@ use super::SearchError;
 /// ```
 pub fn find_root_newton_raphson<F, Func, Deriv>(
     start: F,
-    f: Func,
-    d: Deriv,
+    mut f: Func,
+    mut d: Deriv,
     convergency: &mut dyn Convergency<F>,
 ) -> Result<F, SearchError>
 where
     F: FloatType,
-    Func: Fn(F) -> F,
-    Deriv: Fn(F) -> F,
+    Func: FnMut(F) -> F,
+    Deriv: FnMut(F) -> F,
 {
     let mut x = start;
 

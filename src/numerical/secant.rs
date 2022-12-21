@@ -60,10 +60,10 @@ use super::SearchError;
 /// let root2 = find_root_secant(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_secant<F, Func>(first: F, second: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>
+pub fn find_root_secant<F, Func>(first: F, second: F, mut f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>
 where
     F: FloatType,
-    Func: Fn(F) -> F,
+    Func: FnMut(F) -> F,
 {
     let mut x1 = first;
     let mut y1 = f(x1);
