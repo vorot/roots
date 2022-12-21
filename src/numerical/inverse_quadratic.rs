@@ -90,10 +90,10 @@ where
 /// let root2 = find_root_inverse_quadratic(-10f64, 0f64, &f, &mut 1e-15f64);
 /// // Returns approximately Ok(-1);
 /// ```
-pub fn find_root_inverse_quadratic<F, Func>(a: F, b: F, f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>
+pub fn find_root_inverse_quadratic<F, Func>(a: F, b: F, mut f: Func, convergency: &mut dyn Convergency<F>) -> Result<F, SearchError>
 where
     F: FloatType,
-    Func: Fn(F) -> F,
+    Func: FnMut(F) -> F,
 {
     let (x1, x2) = if a > b { (b, a) } else { (a, b) };
     let sample1 = Sample { x: x1, y: f(x1) };
