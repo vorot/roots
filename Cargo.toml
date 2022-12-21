@@ -1,7 +1,7 @@
 [package]
 
 name = "roots"
-version = "0.0.7"
+version = "0.0.8"
 authors = ["Mikhail Vorotilov <mikhail.vorotilov@gmail.com>"]
 license = "BSD-2-Clause"
 repository = "https://github.com/vorot/roots"
