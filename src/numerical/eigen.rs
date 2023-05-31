@@ -481,9 +481,9 @@ pub fn hqr2(n_in: usize, h: &mut Matrix, v: &mut Matrix, d: &mut Vec<f64>, e: &m
                     if (eps * t) * t > 1. {
                         let mut j = i;
                         while j <= n {
-                            j = j + 1;
                             h[[j as usize, n as usize - 1]] = h[[j as usize, n as usize - 1]] / t;
                             h[[j as usize, n as usize]] = h[[j as usize, n as usize]] / t;
+                            j = j + 1;
                         }
                     }
                 }
@@ -662,26 +662,20 @@ fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)> {
 /// ```
 /// use roots::find_roots_eigen;
 ///
-/// let roots = find_roots_eigen(vec!(0f64, -1f64, 0f64));
+/// let roots = find_roots_eigen(&[0f64, -1f64, 0f64]);
 /// // Returns [0f64, 0.9999999999999999f64, -0.9999999999999999f64] while 'x^3 - x = 0' has roots -1, 0, and 1
 /// ```
-pub fn find_roots_eigen(c: Vec<f64>) -> VecDeque<f64> {
+pub fn find_roots_eigen(c: &[f64]) -> impl Iterator<Item = f64> {
     let n = c.len();
     let mut m = Matrix::new(n);
     for i in 0..(n - 1) {
         m[[i + 1, i]] = 1.;
     }
     for i in 0..(n) {
-        m[[i, n - 1]] = -c[n-i-1];
+        m[[i, n - 1]] = -c[n - i - 1];
     }
     let ei = calc_eigen(&mut m);
-    let mut r = VecDeque::new();
-    for c in ei {
-        if c.1 * c.1 == 0. {
-            r.push_back(c.0);
-        }
-    }
-    r
+    ei.into_iter().filter(|c| c.1 * c.1 == 0.).map(|c| c.0)
 }
 
 #[cfg(test)]
@@ -690,7 +684,7 @@ mod test {
 
     #[test]
     fn test_find_roots_eigen() {
-        let roots = find_roots_eigen(vec![0f64, -1f64, 0f64]);
+        let roots: Vec<f64> = find_roots_eigen(&[0f64, -1f64, 0f64]).collect();
         assert_eq!(roots[0], 0f64);
         assert_eq!(roots[1], 0.9999999999999999f64);
         assert_eq!(roots[2], -0.9999999999999999f64);
@@ -698,7 +692,7 @@ mod test {
 
     #[test]
     fn test_find_roots_eigen_asymetric() {
-        let roots = find_roots_eigen(vec![1f64, 2f64, 3f64]);
+        let roots: Vec<f64> = find_roots_eigen(&[1f64, 2f64, 3f64]).collect();
         // (According to Wolfram Alpha, roots must be -1.275682203650984989057077)
         assert_eq!(roots[0], -1.2756822036509838f64);
     }
@@ -713,8 +707,8 @@ mod test {
             0.0689539597036461f64 / -0.000000000000000040410628481035f64,
         ];
 
-        let roots = find_roots_eigen(vec);
-       
+        let roots: Vec<f64> = find_roots_eigen(&vec).collect();
+
         // (According to Wolfram Alpha, roots must be 0.7547108770537f64, 7.23404258961f64, 312537357195213f64)
         // This means that this function is not as precise.
         assert_eq!(roots[0], 0.0);
@@ -733,7 +727,7 @@ mod test {
             -16.0f64 / -14.0625f64,
         ];
 
-        let roots = find_roots_eigen(vec);
+        let roots: Vec<f64> = find_roots_eigen(&vec).collect();
         // (According to Wolfram Alpha, roots must be -1.1016116464173349f64, 0.9682783130840016f64)
         assert_eq!(roots[0], -1.1016116368323874f64);
         assert_eq!(roots[1], 0.9682783013144586f64);
@@ -743,8 +737,16 @@ mod test {
     fn test_find_roots_sebedard13() {
         // (as reported by Sebedard13 in August 2023)
         let vec = vec![-2.5, 5.0, -5.0, 2.5, -0.5];
-        let roots = find_roots_eigen(vec);
+        let roots: Vec<f64> = find_roots_eigen(&vec).collect();
         // (According to Wolfram Alpha, roots must be 0.50f64)
         assert_eq!(roots[0], 0.49999999999999833f64);
+    }
+
+    #[test]
+    fn test_find_roots_eigen_panic_case() {
+        // This call panics in 0.0.8 version.
+        let roots: Vec<f64> =
+            find_roots_eigen(&[-111.35528725660045, 4666.666666666667, -87228.30835100368, 613541.6666666666]).collect();
+        assert_eq!(roots.len(), 0);
     }
 }
