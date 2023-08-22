@@ -37,10 +37,10 @@ impl Matrix {
 }
 impl fmt::Debug for Matrix {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{{").ok();
+        writeln!(f, "{{").ok();
         for r in 0..self.n {
             for c in 0..self.n {
-                write!(f, "{:.3?} ", self[[c, r]]).ok();
+                write!(f, "{:.3?} ", self[[r, c]]).ok();
             }
             writeln!(f, "").ok();
         }
@@ -652,7 +652,7 @@ fn calc_eigen(m: &mut Matrix) -> Vec<(f64, f64)> {
     r
 }
 
-/// Find all roots of the normalized polynomial by finding eigen numbers of the corresponding matrix.
+/// Find all roots of the normalized polynomial x^n + c[0]*x^(n-1) + c[1]*x^(n-2) + … + c[n-1] = 0 by finding eigen numbers of the corresponding matrix.
 /// (Converted from Java by stiv-yakovenko)
 ///
 /// Note that found roots are approximate and not sorted.
@@ -672,7 +672,7 @@ pub fn find_roots_eigen(c: Vec<f64>) -> VecDeque<f64> {
         m[[i + 1, i]] = 1.;
     }
     for i in 0..(n) {
-        m[[i, n - 1]] = -c[i];
+        m[[i, n - 1]] = -c[n-i-1];
     }
     let ei = calc_eigen(&mut m);
     let mut r = VecDeque::new();
@@ -697,35 +697,54 @@ mod test {
     }
 
     #[test]
+    fn test_find_roots_eigen_asymetric() {
+        let roots = find_roots_eigen(vec![1f64, 2f64, 3f64]);
+        dbg!(&roots);
+        assert_eq!(roots[0], -1.2756822036509838f64);
+    }
+
+    #[test]
     fn test_find_roots_eigen_huge_discriminant() {
         // Try to find roots of the normalized cubic polynomial where the highest coefficient was very small
         // (as reported by Andrew Hunter in July 2019)
-        let roots = find_roots_eigen(vec![
+        let vec = vec![
             0.0126298310280606f64 / -0.000000000000000040410628481035f64,
             -0.100896606408756f64 / -0.000000000000000040410628481035f64,
             0.0689539597036461f64 / -0.000000000000000040410628481035f64,
-        ]);
+        ];
+
+        let roots = find_roots_eigen(vec);
+       
         // (According to Wolfram Alpha, roots must be 0.7547108770537f64, 7.23404258961f64, 312537357195213f64)
-        // This means that this function cannot handle such huge numbers.
-        assert_eq!(roots[0], 0f64);
-        assert_eq!(roots[1], 1.5f64);
-        assert_eq!(roots[2], 1706332276816893f64);
+        // This means that this function is not as precise.
+        assert_eq!(roots[0], 0.0);
+        assert_eq!(roots[1], 8.0f64);
+        assert_eq!(roots[2], 312537357195212.8f64);
     }
 
     #[test]
     fn test_find_roots_eigen_tim_lueke() {
         // Try to find roots of the normalized quartic polynomial where the discriminant must be 0
         // (as reported by Tim Lueke in December 2019)
-        let roots = dbg!(find_roots_eigen(vec![
+        let vec = vec![
             -3.75f64 / -14.0625f64,
             29.75f64 / -14.0625f64,
             4.0f64 / -14.0625f64,
             -16.0f64 / -14.0625f64,
-        ]));
+        ];
+
+        let roots = find_roots_eigen(vec);
         // (According to Wolfram Alpha, roots must be -1.1016116464173349f64, 0.9682783130840016f64)
-        // This means that this function cannot handle such small discriminant.
-        // But at least it finds the right number of them.
-        assert_eq!(roots[0], 0.9990584398692597f64);
-        assert_eq!(roots[1], 0.12511486301943303f64);
+        assert_eq!(roots[0], -1.1016116368323874f64);
+        assert_eq!(roots[1], 0.9682783013144586f64);
+    }
+
+    #[test]
+    fn test_find_roots_sebedard13() {
+        // (as reported by Sebedard13 in August 2023)
+        let vec = vec![-2.5, 5.0, -5.0, 2.5, -0.5];
+        let roots = find_roots_eigen(vec);
+        // (According to Wolfram Alpha, roots must be 0.50f64)
+        assert_eq!(roots[0], 0.49999999999999833f64);
     }
 }
