@@ -699,7 +699,7 @@ mod test {
     #[test]
     fn test_find_roots_eigen_asymetric() {
         let roots = find_roots_eigen(vec![1f64, 2f64, 3f64]);
-        dbg!(&roots);
+        // (According to Wolfram Alpha, roots must be -1.275682203650984989057077)
         assert_eq!(roots[0], -1.2756822036509838f64);
     }
 
