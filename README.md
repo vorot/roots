@@ -1,6 +1,6 @@
 Library of well known algorithms for numerical root finding.
 
-[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)[![Build Status](https://travis-ci.com/vorot/roots.svg)](https://travis-ci.com/vorot/roots)[![Crates.io](https://img.shields.io/crates/v/roots.svg)](https://crates.io/crates/roots)
+[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)[![Build Status](https://github.com/vorot/roots/actions/workflows/rust.yml/badge.svg)](https://github.com/vorot/roots/actions/workflows/rust.yml)[![Crates.io](https://img.shields.io/crates/v/roots.svg)](https://crates.io/crates/roots)
 
 ## Features
 
