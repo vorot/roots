@@ -99,7 +99,7 @@ where
 }
 
 /// Possible errors
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum SearchError {
     /// The algorithm could not converge within the given number of iterations
     NoConvergency,
