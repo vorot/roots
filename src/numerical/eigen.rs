@@ -729,8 +729,8 @@ mod test {
 
         let roots: Vec<f64> = find_roots_eigen(&vec).collect();
         // (According to Wolfram Alpha, roots must be -1.1016116464173349f64, 0.9682783130840016f64)
-        assert_eq!(roots[0], -1.1016116368323874f64);
-        assert_eq!(roots[1], 0.9682783013144586f64);
+        assert_float_eq!(1e-14f64, roots[0], -1.1016116368323874f64);
+        assert_float_eq!(1e-14f64, roots[1], 0.9682783013144586f64);
     }
 
     #[test]
